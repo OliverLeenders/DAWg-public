@@ -26,11 +26,11 @@ describe('versions', () => {
 });
 
 const github = JSON.stringify([
-  { tag_name: 'v1.2.0-beta.1', name: '', body: 'Beta', html_url: 'https://github.com/OliverLeenders/DAWg/releases/tag/v1.2.0-beta.1', prerelease: true },
-  { tag_name: 'v1.1.0', name: 'DAWg 1.1', body: 'Notes', html_url: 'https://github.com/OliverLeenders/DAWg/releases/tag/v1.1.0', prerelease: false },
+  { tag_name: 'v1.2.0-beta.1', name: '', body: 'Beta', html_url: 'https://github.com/OliverLeenders/DAWg-public/releases/tag/v1.2.0-beta.1', prerelease: true },
+  { tag_name: 'v1.1.0', name: 'DAWg 1.1', body: 'Notes', html_url: 'https://github.com/OliverLeenders/DAWg-public/releases/tag/v1.1.0', prerelease: false },
   { tag_name: 'v1.3.0', name: 'Draft', html_url: 'https://github.com/x', draft: true },
   { tag_name: 'test-build', html_url: 'https://github.com/x' },
-  { tag_name: 'v1.0.1', name: 'DAWg 1.0.1', body: '', html_url: 'https://github.com/OliverLeenders/DAWg/releases/tag/v1.0.1' },
+  { tag_name: 'v1.0.1', name: 'DAWg 1.0.1', body: '', html_url: 'https://github.com/OliverLeenders/DAWg-public/releases/tag/v1.0.1' },
 ]);
 
 describe('which release is offered', () => {

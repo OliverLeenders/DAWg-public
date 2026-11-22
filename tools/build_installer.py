@@ -295,7 +295,7 @@ def build_deb(app_dir, out_dir, version):
         'Recommends: ' + ', '.join(LINUX_RECOMMENDS),
         'Section: sound',
         'Priority: optional',
-        'Homepage: https://github.com/OliverLeenders/DAWg',
+        'Homepage: https://github.com/OliverLeenders/DAWg-public',
         'Description: Digital audio workstation',
         ' DAWg is a DAW with a visual MPE piano roll, node-based effects routing and',
         ' scriptable effects in Faust. It hosts VST3 and CLAP plugins.',

@@ -9,8 +9,8 @@ namespace dawg
 
 namespace
 {
-constexpr auto releasesUrl = "https://api.github.com/repos/OliverLeenders/DAWg/releases?per_page=30";
-constexpr auto releasePages = "https://github.com/OliverLeenders/DAWg/";
+constexpr auto releasesUrl = "https://api.github.com/repos/OliverLeenders/DAWg-public/releases?per_page=30";
+constexpr auto releasePages = "https://github.com/OliverLeenders/DAWg-public/";
 constexpr int connectionTimeoutMs = 10000;
 } // namespace
 

@@ -7,8 +7,8 @@ list). The owner took every recommendation below.
 
 ## Decisions
 
-**UC1. Releases come from GitHub.** The app asks GitHub's public API for the releases of `OliverLeenders/DAWg`
-(`https://api.github.com/repos/OliverLeenders/DAWg/releases`); there is no server of DAWg's own. A release's tag is
+**UC1. Releases come from GitHub.** The app asks GitHub's public API for the releases of `OliverLeenders/DAWg-public`
+(`https://api.github.com/repos/OliverLeenders/DAWg-public/releases`); there is no server of DAWg's own. A release's tag is
 its version, with or without a leading `v`: `v1.0.1`, `1.1.0-beta.2`. Drafts are ignored.
 
 **UC2. Versions compare as semantic versions.** Major, minor and patch numerically; a version with a pre-release
