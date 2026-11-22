@@ -116,14 +116,18 @@ function(dawg_add_engine target)
         dawg_lame
         dawg_onnxruntime)
 
-    # ONNX Runtime (PitchModels.cmake) is a shared library. On Windows it goes next to the executable, so it is found
-    # before the older copy Windows itself has; elsewhere the build finds it through its rpath.
-    if(WIN32)
+    # ONNX Runtime (PitchModels.cmake) is a shared library. On Windows and Linux it goes next to the executable, so the
+    # app folder works wherever it is installed (on Windows also before the older copy Windows itself has); Linux finds
+    # it there through an $ORIGIN rpath. macOS finds it through its rpath into the build.
+    if(APPLE)
+        set_property(TARGET ${target} APPEND PROPERTY BUILD_RPATH "${DAWG_ONNXRUNTIME_DIR}/lib")
+    else()
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:dawg_onnxruntime>" "$<TARGET_FILE_DIR:${target}>"
             VERBATIM)
-    else()
-        set_property(TARGET ${target} APPEND PROPERTY BUILD_RPATH "${DAWG_ONNXRUNTIME_DIR}/lib")
+        if(NOT WIN32)
+            set_property(TARGET ${target} APPEND PROPERTY BUILD_RPATH "$ORIGIN")
+        endif()
     endif()
 
     target_compile_definitions(${target} PRIVATE "DAWG_FAUST_LIBRARIES_DIR=\"${DAWG_FAUST_LIBRARIES_DIR}\""

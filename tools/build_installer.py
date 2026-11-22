@@ -212,8 +212,11 @@ def linked_packages(exe):
         sys.exit('Libraries not found for %s: %s' % (exe, ', '.join(missing)))
 
     packages = set()
+    app_dir = os.path.dirname(os.path.realpath(exe))
     for path in re.findall(r'=> (/\S+)', output):
         real = os.path.realpath(path)
+        if os.path.dirname(real) == app_dir:
+            continue  # shipped next to the app (ONNX Runtime)
         for candidate in (path, real):
             found = subprocess.run(['dpkg', '-S', candidate], capture_output=True, text=True)
             if found.returncode == 0:
@@ -241,6 +244,9 @@ def maintainer():
 def copy_app(app_dir, dest):
     os.makedirs(dest, exist_ok=True)
     shutil.copy2(os.path.join(app_dir, 'DAWg'), os.path.join(dest, 'DAWg'))
+    # ONNX Runtime, which the app finds next to itself through its $ORIGIN rpath.
+    for library in glob.glob(os.path.join(app_dir, 'lib*.so*')):
+        shutil.copy2(library, os.path.join(dest, os.path.basename(library)))
     for folder in ('ui', 'faust', 'midi-files', 'models', 'licenses'):
         shutil.copytree(os.path.join(app_dir, folder), os.path.join(dest, folder))
     shutil.copy2(os.path.join(ROOT, 'LICENSE'), os.path.join(dest, 'LICENSE'))
