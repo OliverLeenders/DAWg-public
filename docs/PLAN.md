@@ -177,7 +177,7 @@ a per-note **voice graph** (receives that note's curves) feeding a monophonic **
       * **Installers for macOS and Linux**, beside the Windows one. macOS builds are **not signed or notarised**: an
         Apple developer account costs money, and DAWg is free. The download page and the installer's readme explain
         opening an unsigned app (Open from the context menu, or removing the quarantine attribute). **Linux done**
-        (2026-11-14): `tools/build_installer.py` on Debian or Ubuntu builds a .deb (the app in /opt/dawg, a `dawg`
+        (2026-11-14): `tools/build_installer.py` on Debian or Ubuntu builds a .deb (the app in /opt/dawg, a `dawg-daw`
         command, a menu entry and icons, its dependencies read from the executable through dpkg) and a .tar.gz to unpack
         anywhere. Installed from the .deb on Ubuntu 24.04 in WSL, DAWg starts and shows its welcome screen. Getting
         there fixed a crash on start on Linux: the web view's child process died in Mesa's GL driver, which called into

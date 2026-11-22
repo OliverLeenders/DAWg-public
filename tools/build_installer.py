@@ -7,9 +7,9 @@ Builds the UI and the DAWg target in Release first (unless --no-build), so the i
 Windows: the setup program from installer/DAWg.iss, after checking that DAWg.exe carries its icon. Needs Inno Setup 6
 (winget install JRSoftware.InnoSetup) and Visual Studio's MSVC runtime redistributables.
 
-Linux: a .deb (the app in /opt/dawg, a `dawg` command, a desktop entry and icons; its dependencies read from the
-executable through dpkg, so build on the oldest Debian or Ubuntu it should install on) and a .tar.gz to unpack
-anywhere. Needs dpkg-deb, and Node.js and npm for the UI.
+Linux: a .deb (package dawg-daw: the app in /opt/dawg, a `dawg-daw` command, a desktop entry and icons; its
+dependencies read from the executable through dpkg, so build on the oldest Debian or Ubuntu it should install on) and a
+.tar.gz to unpack anywhere. Needs dpkg-deb, and Node.js and npm for the UI.
 
 The packages land in <build dir>/installer.
 """
@@ -137,13 +137,17 @@ LINUX_LOADED_DEPENDS = [
 ]
 LINUX_RECOMMENDS = ['libjack-jackd2-0 | libjack0']
 
+# The Debian package, its command, menu entry and icon are dawg-daw: Ubuntu's archive already has an unrelated
+# package called dawg (a DNA sequence simulator), which apt would take for a newer version of this one.
+LINUX_PACKAGE = 'dawg-daw'
+
 LINUX_DESKTOP_ENTRY = """[Desktop Entry]
 Type=Application
 Name=DAWg
 GenericName=Digital Audio Workstation
 Comment=A DAW with an MPE piano roll, node-based routing and Faust scripting
-Exec=dawg
-Icon=dawg
+Exec=dawg-daw
+Icon=dawg-daw
 Terminal=false
 Categories=AudioVideo;Audio;Midi;Music;
 StartupWMClass=DAWg
@@ -277,14 +281,14 @@ def build_deb(app_dir, out_dir, version):
     shutil.rmtree(stage, ignore_errors=True)
 
     copy_app(app_dir, os.path.join(stage, 'opt', 'dawg'))
-    write(os.path.join(stage, 'usr', 'bin', 'dawg'), LINUX_LAUNCHER, 0o755)
-    write(os.path.join(stage, 'usr', 'share', 'applications', 'dawg.desktop'), LINUX_DESKTOP_ENTRY)
+    write(os.path.join(stage, 'usr', 'bin', 'dawg-daw'), LINUX_LAUNCHER, 0o755)
+    write(os.path.join(stage, 'usr', 'share', 'applications', 'dawg-daw.desktop'), LINUX_DESKTOP_ENTRY)
     icons = os.path.join(stage, 'usr', 'share', 'icons', 'hicolor')
     os.makedirs(os.path.join(icons, '256x256', 'apps'))
     os.makedirs(os.path.join(icons, 'scalable', 'apps'))
-    shutil.copy2(os.path.join(ROOT, 'branding', 'dawg-icon-256.png'), os.path.join(icons, '256x256', 'apps', 'dawg.png'))
-    shutil.copy2(os.path.join(ROOT, 'branding', 'dawg-icon.svg'), os.path.join(icons, 'scalable', 'apps', 'dawg.svg'))
-    doc = os.path.join(stage, 'usr', 'share', 'doc', 'dawg')
+    shutil.copy2(os.path.join(ROOT, 'branding', 'dawg-icon-256.png'), os.path.join(icons, '256x256', 'apps', 'dawg-daw.png'))
+    shutil.copy2(os.path.join(ROOT, 'branding', 'dawg-icon.svg'), os.path.join(icons, 'scalable', 'apps', 'dawg-daw.svg'))
+    doc = os.path.join(stage, 'usr', 'share', 'doc', 'dawg-daw')
     os.makedirs(doc)
     shutil.copy2(os.path.join(ROOT, 'LICENSE'), os.path.join(doc, 'copyright'))
 
@@ -292,7 +296,7 @@ def build_deb(app_dir, out_dir, version):
                   for folder, _, names in os.walk(stage) for name in names) // 1024
     depends = linked_packages(os.path.join(app_dir, 'DAWg')) + LINUX_LOADED_DEPENDS
     write(os.path.join(stage, 'DEBIAN', 'control'), '\n'.join([
-        'Package: dawg',
+        'Package: ' + LINUX_PACKAGE,
         'Version: ' + version,
         'Architecture: ' + arch,
         'Maintainer: ' + maintainer(),
@@ -306,9 +310,9 @@ def build_deb(app_dir, out_dir, version):
         ' DAWg is a DAW with a visual MPE piano roll, node-based effects routing and',
         ' scriptable effects in Faust. It hosts VST3 and CLAP plugins.',
     ]) + '\n')
-    normalise_modes(stage, {'opt/dawg/DAWg', 'usr/bin/dawg'})
+    normalise_modes(stage, {'opt/dawg/DAWg', 'usr/bin/dawg-daw'})
 
-    package = os.path.join(out_dir, 'dawg_%s_%s.deb' % (version, arch))
+    package = os.path.join(out_dir, '%s_%s_%s.deb' % (LINUX_PACKAGE, version, arch))
     subprocess.run(['dpkg-deb', '--root-owner-group', '--build', stage, package], check=True,
                    stdout=subprocess.DEVNULL)
     shutil.rmtree(stage)
@@ -320,8 +324,8 @@ def build_tarball(app_dir, out_dir, version):
     stage = os.path.join(out_dir, name)
     shutil.rmtree(stage, ignore_errors=True)
     copy_app(app_dir, stage)
-    write(os.path.join(stage, 'dawg.desktop'), LINUX_DESKTOP_ENTRY.replace('Exec=dawg', 'Exec=DAWg'))
-    shutil.copy2(os.path.join(ROOT, 'branding', 'dawg-icon-256.png'), os.path.join(stage, 'dawg.png'))
+    write(os.path.join(stage, 'dawg-daw.desktop'), LINUX_DESKTOP_ENTRY.replace('Exec=dawg-daw', 'Exec=DAWg'))
+    shutil.copy2(os.path.join(ROOT, 'branding', 'dawg-icon-256.png'), os.path.join(stage, 'dawg-daw.png'))
     write(os.path.join(stage, 'README.txt'), """DAWg %s for Linux
 
 Run ./DAWg from this folder; it finds ui/, faust/ and midi-files/ next to itself.
@@ -333,8 +337,8 @@ there. On Debian or Ubuntu:
 
 (libasound2 and libcurl4 before Ubuntu 24.04.) The .deb installs all of this by itself, with a menu entry.
 
-To add DAWg to the menu by hand, put dawg.desktop in ~/.local/share/applications with Exec= set to this folder's
-DAWg, and dawg.png in ~/.local/share/icons.
+To add DAWg to the menu by hand, put dawg-daw.desktop in ~/.local/share/applications with Exec= set to this folder's
+DAWg, and dawg-daw.png in ~/.local/share/icons.
 """ % version)
 
     normalise_modes(stage, {'DAWg'})
