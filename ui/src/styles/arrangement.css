@@ -1,0 +1,248 @@
+/* The arrangement, its clip menu, resizable panels, audio and recording.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Arrangement (phase 6) ---------------------------------------------------- */
+.arrangement { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+.arrangement-grid { flex: 1; min-height: 0; display: grid; }
+/* The graph view in place of the timeline, beside the track headers: the time rows and lanes hide (they keep their
+   state for the way back), and the graph spans the right column. */
+.arrangement-grid.graph-mode > :not(.arrangement-graph, .graph-corner, .track-header-column, .master-column) { display: none; }
+.arrangement-graph { grid-column: 2; grid-row: 1 / -1; z-index: 2; display: flex; min-width: 0; min-height: 0; background: var(--bg); }
+.arrangement-graph > .graph-view { flex: 1; min-width: 0; }
+/* The graph's toolbar is the height of the "+ Track" row beside it, so their bottom rules line up. */
+.arrangement-graph .roll-toolbar { height: 26px; padding: 0 10px; gap: var(--space-4); font-size: var(--text-s); }
+.arrangement-graph .roll-toolbar select { padding: 0 var(--space-2); height: 20px; font-size: var(--text-xs); }
+.arrangement-grid canvas { width: 100%; height: 100%; display: block; min-width: 0; min-height: 0; }
+.arrangement-corner {
+  display: flex; align-items: center; padding: 0 var(--space-4); background: var(--bg-raised);
+  border-bottom: 1px solid var(--border); border-right: 1px solid var(--border);
+}
+.arrangement-corner .text-button { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-4); font-size: var(--text-xs); }
+.marker-label { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); }
+.marker-label .corner-add { margin-left: 4px; opacity: 0.7; }
+.marker-label .corner-add:hover { opacity: 1; }
+/* The signature strip and tempo lane under the ruler (docs/design/tempo-map.md, TM12). */
+.arrangement-corner .spacer { flex: 1; }
+/* The global mute and solo switches in the track list header (clear all). */
+.global-switches { display: flex; align-items: center; gap: var(--space-2); }
+.global-switches-label { font-size: var(--text-xs); color: var(--text-dim); margin-right: 1px; }
+.glyph { display: block; flex: none; }
+.segment .glyph, .segment > svg, .segmented > button > svg { display: block; margin: 0 auto; }
+.segment:has(> svg) { min-width: 24px; padding: 0 var(--space-2); display: flex; align-items: center; justify-content: center; }
+/* A row of pictures is a compact control: the height of a field, not of a knob (the oscillator's waveform). */
+.segmented-slot:has(> .segment > svg) { height: var(--control); margin: 4px 0; }
+/* A parameter as a labelled field (Knob.tsx, ParamField). */
+.param-field { display: flex; flex-direction: column; gap: var(--space-1); font-size: var(--text-xs); color: var(--text-dim); }
+.param-field.inactive { opacity: 0.4; }
+/* Dimmed, still draggable: a value can be set before switching the mode that uses it (design-system.md, 6.1, 6). */
+/* The Oscillator's panel: its sections side by side, wrapping onto a second row. */
+.osc-panel { display: block; }
+.osc-panel .osc-sections { display: grid; grid-template-columns: repeat(3, max-content); gap: var(--space-5) var(--space-7); align-content: start; }
+.osc-fields { display: flex; gap: var(--space-4); align-items: flex-start; }
+.global-switches .switch { width: 18px; height: var(--control-s); font-size: var(--text-xs); }
+.global-switches .switch:disabled { cursor: default; opacity: 0.55; }
+.global-switches .switch:disabled:hover { border-color: var(--border); color: var(--text-dim); }
+/* Nothing on, but a click brings back what the last click cleared. */
+.global-switches .switch.mute.restorable { border-color: var(--mute); color: var(--mute); }
+.global-switches .switch.solo.restorable { border-color: var(--solo); color: var(--solo); }
+.mixer-toolbar .global-switches .switch { width: 22px; height: 22px; font-size: var(--text-xs); }
+.arrangement-corner .corner-toggle { height: 14px; padding: 0 var(--space-3); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; }
+.signature-strip { cursor: default; }
+.tempo-corner { flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--space-1); }
+.tempo-now { font-family: var(--mono); font-size: var(--text-s); color: var(--accent-ink); }
+.signature-prompt .signature-fields { display: flex; gap: var(--space-6); align-items: flex-start; }
+.signature-prompt input[type='number'] { width: 72px; }
+.text-button.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
+.field .badge { margin-left: -2px; padding: 0 var(--space-2); font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.04em; color: var(--accent-ink);
+  background: var(--accent-soft); border: 1px solid var(--accent); border-radius: var(--radius-s); vertical-align: 1px; }
+.lcd.position.clickable { cursor: pointer; }
+.marker-row:focus { outline: none; }
+.toolbar-group-label { color: var(--text-dim); font-size: var(--text-xs); white-space: nowrap; margin-right: 2px; }
+button.lcd.signature-button { cursor: pointer; }
+button.lcd.signature-button:hover { border-color: var(--accent); }
+.arrangement-canvas:focus { outline: none; }
+.track-headers { position: relative; overflow: hidden; background: var(--bg-raised); border-right: 1px solid var(--border); outline: none; }
+/* Track headers: rows of name, switches and gain/pan, laid out by lane height (TrackHeaders.tsx, headerTier) and
+   trimmed by header width, so no size overlaps. */
+.track-header {
+  position: absolute; left: 0; right: 0; display: flex;
+  cursor: default; overflow: hidden; container-type: inline-size;
+}
+/* The separator under a header starts after its groups' spines (--indent), so it never cuts across them. */
+.track-header::after, .automation-header::after {
+  content: ''; position: absolute; left: var(--indent, 0px); right: 0; bottom: 0; height: 1px;
+  background: var(--border); pointer-events: none;
+}
+.track-header .track-colour { width: 4px; align-self: stretch; height: auto; border-radius: 0; flex-shrink: 0; }
+.track-header-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3) var(--space-3) 0 var(--space-4); }
+.track-header.compact .track-header-body { justify-content: center; padding-top: 0; padding-bottom: 1px; }
+.track-header.tall .track-header-body { gap: var(--space-3); padding-top: 7px; }
+.header-row { display: flex; align-items: center; gap: var(--space-2); min-height: 20px; min-width: 0; }
+/* Track headers: rows of exactly 20 px, so every switch sits on whole pixels; the switches in fixed columns from the
+   right edge, the track's own, then mute and solo (TrackHeaders.tsx, Switches). */
+.track-header .header-row { height: 20px; min-height: 0; gap: var(--space-2); }
+/* Gain and pan centred in their 20 px row (not on the text's baseline), and their MIDI-learn wrapper no taller than
+   the field, so neither lands on a half pixel. */
+.track-header .track-mix { align-items: center; }
+.track-header .track-mix .midi-learnable { display: flex; }
+.switch-group { display: flex; gap: var(--space-2); flex: none; }
+.switch-group:empty { display: none; }
+.switch-group.shared { margin-left: 4px; }
+.track-header .track-gain, .track-header .track-pan { height: 20px; line-height: 18px; }
+.track-header .track-pan { text-align: center; }
+.header-row .track-name, .header-row .track-name-input { flex: 1; min-width: 0; margin-right: 5px; }
+.header-row .track-mix { flex: 1; min-width: 0; white-space: nowrap; }
+.header-row-gap { flex: 1; }
+/* A whole number of pixels wide (room for "-12.0 dB" at 12 px), so the pan field beside it starts on a whole pixel. */
+.track-header .track-gain { text-align: left; min-width: 0; width: 68px; flex: none; }
+/* Groups (docs/design/groups-and-sends.md, R9): each enclosing group adds a spine in its colour at the left; an
+   open group's arms are tinted with its colour, so arms and spine read as a "C" around the members. */
+.track-spines { position: relative; flex-shrink: 0; align-self: stretch; }
+.track-spine { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: 2px; opacity: 0.85; }
+.track-spine.own.top { top: 5px; border-top-left-radius: 3px; border-top-right-radius: 3px; }
+.track-spine.own.bottom { bottom: 5px; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; }
+/* Backgrounds start after the spines too, so an inner group's tint or a selection never covers an outer spine. */
+.group-arm { --tint: color-mix(in srgb, var(--group-colour) 13%, var(--bg-raised)); }
+.group-arm.selected { --tint: color-mix(in srgb, var(--group-colour) 22%, var(--bg-raised)); }
+.group-arm { background: linear-gradient(to right, transparent var(--indent, 0px), var(--tint) var(--indent, 0px)); }
+.group-arm.arm-top::after, .master-header::after { display: none; }
+.group-arm.arm-top .track-header-body { justify-content: center; padding-top: 0; }
+.group-arm.arm-bottom .track-header-body { padding-top: var(--space-3); }
+.group-name { font-weight: 600; }
+.returns-heading {
+  position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-3) 0 10px;
+  background: rgba(0, 0, 0, 0.25); border-bottom: 1px solid var(--border); font-size: var(--text-xs); font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim);
+}
+.returns-heading span { flex: 1; }
+.return-icon { vertical-align: -2px; margin-right: 4px; color: var(--text-dim); }
+/* An output track hangs off its instrument while right under it (docs/design/multi-output-instruments.md, MO9). */
+.track-header.output-header.attached .track-colour { margin-left: 12px; }
+.track-header.output-header.attached::before {
+  content: ''; position: absolute; left: calc(var(--indent, 0px) + 5px); top: 0; height: 50%; width: 6px;
+  border-left: 1px solid var(--text-dim); border-bottom: 1px solid var(--text-dim); border-bottom-left-radius: 3px; opacity: 0.7;
+}
+.track-source { margin-left: 6px; color: var(--text-dim); font-size: 0.9em; }
+.track-source::before { content: '· '; }
+.frozen-icon { vertical-align: -2px; margin-right: 4px; color: var(--accent); }
+.frozen-icon.stale { color: var(--warn); }
+.render-progress { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: var(--z-toast); display: flex; gap: var(--space-4); align-items: center; padding: var(--space-4) var(--space-5); border-radius: var(--radius-l); background: var(--bg-float); border: 1px solid var(--border-strong); color: var(--text); font-size: var(--text-s); box-shadow: var(--shadow); }
+.render-progress progress { width: 140px; }
+.send-slot { gap: var(--space-2); }
+.send-level { font-family: var(--mono); font-size: var(--text-s); color: var(--text-dim); min-width: 58px; text-align: right; cursor: ns-resize; }
+.send-mode { font-size: var(--text-xs); padding: 1px var(--space-3); min-width: 34px; }
+.send-mode.pre { color: var(--accent); border-color: var(--accent); }
+.switch.fold { margin-right: 4px; }
+.track-drop-line { position: absolute; right: 0; height: 2px; background: var(--accent); border-radius: 1px; pointer-events: none; z-index: 5; }
+.track-header.selected:not(.group-arm) {
+  background: linear-gradient(to right, transparent var(--indent, 0px), color-mix(in srgb, var(--accent) 10%, transparent) var(--indent, 0px));
+}
+
+/* Narrow headers: drop what has another home (pan: the inspector). */
+@container (max-width: 150px) {
+  .track-header .track-pan { display: none; }
+  .track-header .switch.automation-mode { display: none; }
+}
+@container (max-width: 125px) {
+  .track-header .switch.monitor, .track-header .switch.expand { display: none; }
+}
+/* A compact row on a narrow header keeps the switches that matter most; the rest return in taller layouts. */
+@container (max-width: 165px) {
+  .track-header.compact .switch.expand, .track-header.compact .switch.monitor { display: none; }
+}
+@container (max-width: 125px) {
+  .track-header.compact .switch.arm { display: none; }
+}
+.track-header-resize { position: absolute; left: 0; right: 0; bottom: -3px; height: 7px; cursor: row-resize; }
+.inspector-track { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-2) var(--space-3) var(--space-4); font-weight: 600; }
+.view-switch .icon-button { width: 30px; }
+.hint { color: var(--text-dim); font-size: var(--text-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.panel.tracks .inspector { margin-left: 0; border-left: none; padding-left: 0; }
+.arrangement .roll-toolbar { flex-wrap: nowrap; }
+.arrangement .hint { flex: 1 1 0; }
+.arrangement-corner .text-button { line-height: 1; }
+
+/* Clip menu, rename, colours (phase 6 follow-up) ---------------------------- */
+.arrangement-lanes { position: relative; min-width: 0; min-height: 0; }
+.arrangement-lanes canvas { position: absolute; inset: 0; }
+.clip-rename {
+  position: absolute; z-index: 5; padding: 0 var(--space-3); font-size: var(--text-xs);
+  background: var(--lcd); border: 1px solid var(--accent); border-radius: var(--radius); outline: none;
+}
+.clip-menu { min-width: 230px; }
+.menu-check-label { display: inline-flex; align-items: center; gap: var(--space-4); }
+.swatches { display: grid; grid-template-columns: repeat(6, 22px); gap: var(--space-3); padding: var(--space-2) var(--space-4) var(--space-3); }
+.swatch {
+  width: 22px; height: 22px; border-radius: var(--radius); border: 1px solid rgba(0, 0, 0, 0.35); cursor: pointer;
+  display: grid; place-items: center; color: var(--on-accent); padding: 0;
+}
+.swatch:hover { outline: 2px solid var(--text); outline-offset: 1px; }
+.swatch.small { width: 12px; height: 12px; display: inline-block; border-radius: var(--radius); }
+.swatch-reset { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-1); cursor: pointer; }
+.swatch-reset input { margin: 0; }
+/* A checkbox filled with a colour, ticked or not: the tick is what changes, as on the swatches. */
+input[type='checkbox'].swatch-check, input[type='checkbox'].swatch-check:checked { width: 14px; height: 14px; background: var(--swatch); border-color: var(--swatch); }
+input[type='checkbox'].swatch-check:hover:not(:disabled) { border-color: var(--text); }
+input[type='checkbox'].swatch-check:checked::after { border-color: var(--on-accent); }
+.track-header button.track-colour { border: none; padding: 0; cursor: pointer; }
+
+/* Resizable, hidable panels ------------------------------------------------ */
+.workspace { gap: 0; }
+.splitter { cursor: col-resize; background: var(--border); transition: background 0.1s; }
+.splitter:hover, .splitter:active { background: var(--accent); }
+.panel-header-buttons { display: flex; align-items: center; gap: var(--space-3); }
+.track-header-column { position: relative; min-height: 0; display: flex; }
+.track-header-column .track-headers { flex: 1; }
+/* Where a browser item dragged over the tracks would go (paletteDrag.ts). */
+.device-drop-mark {
+  position: absolute; left: 0; right: 0; z-index: 5; pointer-events: none; display: flex; align-items: center; padding: 0 var(--space-4);
+  border: 2px solid var(--accent); border-radius: var(--radius); background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-ink); font-size: var(--text-xs);
+}
+.device-drop-mark.refused { border-color: var(--text-faint); background: none; color: var(--text-dim); }
+.device-drop-mark span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.header-splitter { position: absolute; top: 0; bottom: 0; right: -3px; width: 6px; cursor: col-resize; z-index: 2; }
+.header-splitter:hover, .header-splitter:active { background: color-mix(in srgb, var(--accent) 50%, transparent); }
+
+/* The top bar never widens the window: the status group shrinks and the device label ellipsises. */
+.app { grid-template-columns: minmax(0, 1fr); }
+.topbar { min-width: 0; overflow: hidden; }
+.topbar .group.status { min-width: 0; flex-shrink: 1; }
+.topbar .group.status .text-button { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar .stat { white-space: nowrap; flex: none; }
+/* Room for "CPU 100%", so the controls beside it stay put as the number of digits changes. */
+.topbar .stat.cpu { width: 8ch; font-variant-numeric: tabular-nums; }
+.topbar .stat.cpu.late { color: var(--warn); }
+.plugin-processes { display: inline-flex; align-items: center; gap: var(--space-2); margin-left: auto; margin-right: 8px; white-space: nowrap; }
+
+/* Audio (phase 7) ------------------------------------------------------------- */
+.missing-banner {
+  display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) 10px; font-size: var(--text-s);
+  border-bottom: 1px solid var(--warn-rule); background: var(--warn-surface); color: var(--warn-ink);
+}
+.clip-inspector { display: grid; gap: var(--space-3); margin-top: 10px; padding-top: var(--space-4); border-top: 1px solid var(--border); }
+.inspector-field { display: grid; grid-template-columns: 64px auto 1fr; align-items: center; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-dim); }
+.inspector-field input, .inspector-field select {
+  background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-1) var(--space-3); font-size: var(--text-xs); min-width: 0;
+}
+.inspector-field input { grid-column: 2 / -1; }
+.inspector-file { font-size: var(--text-xs); color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.missing-tag { margin-left: 6px; color: var(--warn); }
+
+/* Recording (phase 7) ------------------------------------------------------- */
+.switch {
+  width: 20px; height: 20px; padding: 0; display: grid; place-items: center; font-size: var(--text-xs); font-weight: 700;
+  background: var(--bg-panel); border: 1px solid var(--control-border); border-radius: var(--radius); color: var(--text-dim); cursor: pointer;
+}
+.switch:hover { border-color: var(--border-strong); color: var(--text); }
+/* A lit track switch: its colour's tint, border and letter (the write mode alone stays filled, as it records). */
+.switch.mute.on { background: color-mix(in srgb, var(--mute) 18%, var(--bg-panel)); border-color: var(--mute); color: var(--mute); }
+.switch.solo.on { background: color-mix(in srgb, var(--solo) 18%, var(--bg-panel)); border-color: var(--solo); color: var(--solo); }
+.switch.arm { font-size: var(--text-xs); }
+.switch.arm.on { background: color-mix(in srgb, var(--arm) 18%, var(--bg-panel)); border-color: var(--arm); color: var(--arm); }
+.switch.monitor.m1 { color: var(--monitor); }
+.switch.monitor.m2 { background: color-mix(in srgb, var(--monitor) 18%, var(--bg-panel)); border-color: var(--monitor); color: var(--monitor); }
+.icon-button.record { color: var(--danger); }
+.icon-button.record.active { background: var(--danger); border-color: var(--danger); color: var(--on-accent); }
+.inspector-field select.wide { grid-column: 2 / -1; }

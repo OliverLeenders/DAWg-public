@@ -1,0 +1,95 @@
+/* The piano roll.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Piano roll ------------------------------------------------------------- */
+.editor-placeholder { margin: auto; }
+.piano-roll { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; }
+.roll-toolbar {
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-3) 10px; border-bottom: 1px solid var(--border); background: var(--bg-raised);
+}
+.roll-title { font-weight: 600; }
+.roll-quantise-number {
+  min-width: 42px; text-align: right; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--space-1) var(--space-3); color: var(--text);
+}
+.roll-toolbar .field.disabled { opacity: 0.45; }
+.roll-midi-effects { display: inline-flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-dim); white-space: nowrap; }
+.roll-toolbar .field.disabled .drag-number { pointer-events: none; }
+.roll-toolbar select {
+  background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-2) var(--space-3);
+}
+.roll-grid {
+  flex: 1; min-height: 0; display: grid;
+}
+.roll-grid canvas { width: 100%; height: 100%; display: block; min-width: 0; min-height: 0; }
+/* A canvas with the transparent playhead canvas stacked over it (components/PlayheadOverlay.tsx). The overlay must
+   never take the pointer, so the view's editing handlers stay on the canvas beneath. */
+.canvas-stack { position: relative; min-width: 0; min-height: 0; }
+.canvas-stack > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.loop-tooltip {
+  position: absolute; z-index: 4; transform: translate(-50%, 6px); pointer-events: none;
+  padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-float); color: var(--text); font-size: var(--text-xs); white-space: nowrap;
+  box-shadow: var(--shadow);
+}
+.playhead-overlay { pointer-events: none; }
+.roll-corner, .lane-tabs-corner { background: var(--bg-raised); border-bottom: 1px solid var(--border); }
+.roll-keyboard { cursor: pointer; }
+.lane-tabs {
+  display: flex; gap: var(--space-1); align-items: end; padding: 0 var(--space-4);
+  background: var(--bg-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.lane-label {
+  /* Read across, not up (DS14): the lane's name at the top, cut short where the keyboard is narrow. */
+  padding: var(--space-2) var(--space-2) 0; font-size: var(--text-xs); color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: var(--bg-raised); border-right: 1px solid var(--border);
+}
+.track-row { cursor: pointer; }
+.track-row.selected { box-shadow: inset 0 0 0 1px var(--accent); }
+.roll-canvas:focus { outline: none; }
+.lane-divider {
+  grid-column: 1 / -1; cursor: row-resize; background: var(--bg-raised);
+  border-top: 1px solid var(--border);
+}
+.lane-divider:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.lane-label { cursor: pointer; user-select: none; }
+.piano-roll { position: relative; }
+.vibrato-inspector {
+  display: flex; align-items: center; gap: var(--space-4); font-size: var(--text-xs);
+  padding-left: 10px; border-left: 1px solid var(--border);
+}
+.vibrato-inspector select {
+  background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); padding: 1px var(--space-2); font-size: var(--text-xs);
+}
+.vibrato-icon { color: var(--on); }
+.lcd.small { min-width: 54px; padding: var(--space-1) var(--space-3); font-size: var(--text-xs); }
+.menu-backdrop { position: absolute; inset: 0; z-index: calc(var(--z-popover) - 1); }
+.context-menu {
+  position: absolute; z-index: var(--z-popover); min-width: 180px; padding: var(--space-2);
+  background: var(--bg-float); border: 1px solid var(--border-strong); border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.menu-heading { padding: var(--space-2) var(--space-4); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); }
+/* What a menu acts on, by name (a pad, a clip): sentence case, as names are, above its items. */
+.menu-title { padding: var(--space-2) var(--space-4); font-size: var(--text-m); font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu-item {
+  display: block; width: 100%; text-align: left; padding: var(--space-3) var(--space-4); border: none; border-radius: var(--radius);
+  background: none; cursor: pointer;
+}
+.menu-item:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.lane-tabs { min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.vibrato-inspector { flex-shrink: 0; }
+.piano-roll, .roll-grid { min-width: 0; }
+.roll-toolbar { min-width: 0; flex-wrap: wrap; row-gap: var(--space-3); }
+.roll-toolbar.bar { flex-wrap: nowrap; }
+.roll-title { white-space: nowrap; }
+fieldset.vibrato-inspector { margin: 0; min-width: 0; border-top: none; border-right: none; border-bottom: none; }
+fieldset.vibrato-inspector:disabled { opacity: 0.4; }
+.vibrato-inspector { position: relative; }
+.toolbar-popover { position: absolute; top: calc(100% + 6px); left: 0; z-index: var(--z-popover); display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3); padding: var(--space-4) 10px; background: var(--bg-float); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow); }
+.roll-toolbar .toolbar-group { display: flex; align-items: center; gap: var(--space-4); padding-left: 10px; border-left: 1px solid var(--border); }
+.roll-toolbar .toolbar-group.grid { padding-left: 0; border-left: none; }
+fieldset.vibrato-inspector:disabled .drag-number { pointer-events: none; }
+.editor, .piano-roll { overflow: hidden; }

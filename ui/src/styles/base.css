@@ -1,0 +1,23 @@
+/* The document, its type and the app grid.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+:root {
+  color-scheme: dark;
+  font-family: var(--font);
+  font-size: var(--text-m);
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { user-select: none; overflow: hidden; }
+button { font: inherit; color: inherit; }
+input { font: inherit; color: inherit; }
+h1, h2 { margin: 0; font-weight: 600; }
+h2 { font-size: var(--text-s); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+
+.app { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }

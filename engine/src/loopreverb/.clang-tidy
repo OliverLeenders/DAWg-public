@@ -1,0 +1,11 @@
+# The clean-room reverb (README.md): its code is copied unchanged, so the DAWg checks it doesn't follow are off here
+# instead of being fixed in the copy. Its tail's inner loop is one function on purpose (per-sample code). All other
+# checks still apply.
+InheritParentConfig: true
+Checks: >
+  -readability-function-cognitive-complexity,
+  -readability-identifier-naming,
+  -readability-isolate-declaration,
+  -readability-redundant-member-init
+# Its headers are checked here, with this file's checks (DAWg's root config skips them): no path matches '^$'.
+ExcludeHeaderFilterRegex: '^$'

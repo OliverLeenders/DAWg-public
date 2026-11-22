@@ -1,0 +1,24 @@
+# The clean-room reverb's tests (README.md): copied unchanged, so the DAWg checks they don't follow are off here
+# instead of being fixed in the copy. Their own test runner registers tests in static initialisers, seeds its noise
+# with constants and divides integers on purpose (block counts). Some of its lambdas capture constants
+# that Clang calls unused captures. The recorded accepted output (node/AcceptedSound.h) is a C array of cases, and
+# small result vectors grow in loops. All other checks still apply.
+InheritParentConfig: true
+Checks: >
+  -bugprone-incorrect-roundings,
+  -bugprone-integer-division,
+  -bugprone-macro-parentheses,
+  -bugprone-random-generator-seed,
+  -bugprone-throwing-static-initialization,
+  -modernize-avoid-c-arrays,
+  -performance-inefficient-vector-operation,
+  -readability-avoid-nested-conditional-operator,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-naming,
+  -readability-inconsistent-ifelse-braces,
+  -readability-isolate-declaration,
+  -readability-redundant-casting,
+  -readability-redundant-member-init,
+  -readability-simplify-boolean-expr
+ExtraArgs: ['-Wno-unused-lambda-capture']
+ExcludeHeaderFilterRegex: '^$'

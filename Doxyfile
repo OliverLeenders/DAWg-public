@@ -1,0 +1,26 @@
+# Doxygen configuration for DAWg's C++ API docs (see docs/CODING_GUIDELINES.md, section 2).
+# CI runs this with warnings as errors: every public declaration in a header must be documented.
+PROJECT_NAME           = DAWg
+OUTPUT_DIRECTORY       = build/docs
+INPUT                  = engine/include app/src
+FILE_PATTERNS          = *.h *.dox
+RECURSIVE              = YES
+EXCLUDE_SYMBOLS        = JUCE_* *::anonymous_namespace* detail
+JAVADOC_AUTOBRIEF      = YES
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+EXTRACT_ANON_NSPACES   = NO
+HIDE_UNDOC_CLASSES     = NO
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_IF_INCOMPLETE_DOC = YES
+WARN_NO_PARAMDOC       = NO
+WARN_AS_ERROR          = FAIL_ON_WARNINGS
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+PREDEFINED             = DAWG_ALLOCATION_GUARD=1 JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(x)= JUCE_LEAK_DETECTOR(x)= JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE(x)= JUCE_END_IGNORE_WARNINGS_GCC_LIKE=
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HAVE_DOT               = NO
+QUIET                  = YES

@@ -1,0 +1,17 @@
+# DAWg's tests: the checks below don't fit test code, so they're off here. Tests seed their noise with constants so
+# runs repeat; they read optionals a REQUIRE has just checked; they work out sample counts from small constants
+# (block * blockSize) and halve integer beats; they keep fixtures in file-scope statics, step through values in
+# floating-point loops, grow small result vectors in loops, and give their small test rigs non-const helpers. Exact
+# floating-point comparisons are on purpose too: tests/CMakeLists.txt turns Clang's -Wfloat-equal off for test
+# sources. All other checks still apply.
+InheritParentConfig: true
+Checks: >
+  -bugprone-random-generator-seed,
+  -bugprone-unchecked-optional-access,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -bugprone-misplaced-widening-cast,
+  -bugprone-integer-division,
+  -bugprone-throwing-static-initialization,
+  -bugprone-float-loop-counter,
+  -performance-inefficient-vector-operation,
+  -readability-make-member-function-const

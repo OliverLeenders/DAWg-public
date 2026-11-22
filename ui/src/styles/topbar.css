@@ -1,0 +1,78 @@
+/* The top bar.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Top bar ---------------------------------------------------------------- */
+/* 52 px exactly, with an even 36 px inside and 20 px lines, so the bar's controls and everything under it sit on whole
+   pixels: a half pixel here had blurred every glyph below. */
+.topbar {
+  display: flex; align-items: center; gap: var(--space-6); height: 52px; line-height: 20px;
+  padding: 8px 14px 7px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+}
+/* Where the UI draws the title bar (docs/design/window-chrome.md): full height, against the bar's right edge. */
+.window-controls { display: flex; align-self: stretch; flex: none; margin-left: auto; }
+.window-controls button {
+  display: grid; place-items: center; width: 38px; min-height: var(--control-l); padding: 0;
+  background: none; border: none; border-radius: 0; color: var(--text-dim); cursor: default;
+}
+.window-controls button:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); color: var(--text); }
+.window-controls .window-close:hover { background: var(--danger); color: var(--on-accent); }
+.topbar .window-controls { margin: -8px -14px -7px 0; }
+.topbar > .spacer { min-width: 24px; }
+.mixer-toolbar .window-controls { margin-top: -6px; margin-bottom: -6px; margin-right: -10px; }
+/* The roll's toolbar wraps when narrow: the buttons keep the top right corner, whichever row the tools are on. */
+.roll-toolbar:not(.bar):has(.window-controls) { position: relative; padding-right: 122px; column-gap: var(--space-4); min-height: 37px; }
+.roll-toolbar:not(.bar) .window-controls { position: absolute; top: 0; right: 0; height: 36px; }
+/* In a Bar (the piano roll's) the window buttons are its last item (ui/Bar.tsx), against its right edge. */
+.roll-toolbar.bar { min-height: 37px; }
+.roll-toolbar.bar .window-controls { margin: -6px -10px -6px 0; }
+.brand { display: flex; align-items: center; gap: var(--space-3); font-weight: 800; font-size: var(--text-xl); letter-spacing: -0.02em; }
+.brand-name span, .disconnected h1 span span { color: var(--accent); }
+.brand-mark { flex: none; }
+.brand-reels { stroke: var(--accent); }
+.brand-hub { fill: var(--accent); stroke: none; }
+.group { display: flex; align-items: center; gap: var(--space-3); }
+.spacer { flex: 1; }
+
+/* Buttons, toggles, power, selects: ui/controls.css. */
+.icon-button.play.active { background: var(--ok); border-color: var(--ok); color: var(--on-accent); }
+
+
+.lcd {
+  font-family: var(--mono); font-variant-numeric: tabular-nums;
+  background: var(--lcd); border: 1px solid var(--control-border); border-radius: var(--radius);
+  padding: var(--space-3) 10px; min-width: 64px; text-align: center;
+}
+.position { min-width: 104px; color: var(--ok); font-size: var(--text-l); line-height: 22px; }
+.field { display: flex; align-items: center; gap: var(--space-3); color: var(--text-dim); font-size: var(--text-xs); }
+
+.drag-number { cursor: ns-resize; touch-action: none; display: inline-block; }
+/* A value to drag or type looks like one (3.11): a dotted underline, unless it is drawn as a box already. */
+.drag-number:not(.lcd):not(.editing):not(.number-box):not(.roll-quantise-number):not(.graph-mod-depth):not(.send-level):not(.track-gain):not(.track-pan) { text-decoration: underline dotted var(--text-faint); text-underline-offset: 3px; }
+/* A shown value to click and type into (components/ValueText.tsx). */
+.value-text { cursor: text; text-decoration: underline dotted var(--text-faint); text-underline-offset: 3px; }
+.value-text:hover { color: var(--accent-ink); }
+input.value-text.editing { width: 7ch; min-width: 0; padding: 0 var(--space-1); height: auto; font: inherit; text-align: center; text-decoration: none; }
+.knob input.value-text.editing { width: 56px; }
+.sampler-envelope-box { flex: none; display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
+.sampler-envelope-box > .sampler-envelope { height: clamp(48px, 18cqh, 110px); }
+/* Knobs under the graph where there is room; values to type where there isn't (see the container queries below). */
+.sampler-envelope-knobs { display: flex; justify-content: center; gap: var(--space-6); }
+.readouts.sampler-envelope-values { display: none; }
+
+.drag-number:hover { border-color: var(--accent); }
+input.drag-number.editing { width: 84px; outline: 1px solid var(--accent); }
+
+.stat { font-family: var(--mono); color: var(--text-dim); font-size: var(--text-xs); }
+
+.meter { display: flex; align-items: center; gap: var(--space-2); width: 96px; }
+.meter-lanes { flex: 1; min-width: 0; display: grid; gap: var(--space-1); }
+.meter-lane { height: 5px; background: var(--lcd); border-radius: var(--radius); overflow: hidden; }
+/* The gradient spans the whole lane, fixed to the scale (red at 0 dBFS); the level uncovers it rather than
+   stretching it. */
+.meter-fill {
+  height: 100%; clip-path: inset(0 100% 0 0);
+  background: linear-gradient(90deg, var(--meter-low) 0%, var(--meter-low) 70%, var(--meter-mid) 85%, var(--meter-clip) 100%);
+}

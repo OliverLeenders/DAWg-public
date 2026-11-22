@@ -1,0 +1,463 @@
+/* The code view and the device dock, with its panels.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Code view and device dock (phase 11) --------------------------------------- */
+.editor.panel { flex-direction: column; }
+.centre-view { flex: 1; min-height: 0; min-width: 0; display: flex; overflow: hidden; }
+.centre-view > * { flex: 1; min-width: 0; }
+.spin { animation: spin 1s linear infinite; }
+.segmented { display: inline-flex; border: 1px solid var(--control-border); border-radius: var(--radius); overflow: hidden; }
+.segmented button { border: none; border-right: 1px solid var(--border); background: var(--bg-raised); color: var(--text-dim); padding: var(--space-2) var(--space-4); font-size: var(--text-xs); cursor: pointer; }
+.segmented button:last-child { border-right: none; }
+/* A row of icons only: tighter, so it fits a narrow column (the Delay's Sync, Link and Ping-pong). */
+.segmented > button:has(> svg:only-child) { padding: var(--space-1) var(--space-2); }
+.segmented { flex: none; max-width: 100%; }
+.segmented button.active { background: var(--accent); color: var(--on-accent); }
+/* Toggles side by side (the mixer's sections): each on or off, so the tint (DS11). */
+.segmented.toggles button.active { background: var(--accent-soft); color: var(--accent-ink); box-shadow: inset 0 0 0 1px var(--accent); }
+
+.code-view { display: flex; flex-direction: column; min-height: 0; background: var(--bg); }
+.code-view.empty-view { align-items: center; justify-content: center; gap: var(--space-4); color: var(--text-dim); }
+.code-toolbar { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-4); border-bottom: 1px solid var(--frame); background: var(--bg-raised); }
+.code-toolbar .spacer { flex: 1; }
+.code-node-picker { max-width: 280px; }
+.compile-state { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-dim); }
+.compile-state.ok { color: var(--ok); }
+.compile-state.failed { color: var(--danger); }
+.code-menu-anchor { position: relative; }
+.code-menu { right: 0; top: 30px; max-height: 360px; overflow-y: auto; }
+.code-save { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); min-width: 240px; }
+.code-save input { background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-2) var(--space-3); color: var(--text); }
+.menu-note { padding: var(--space-2) var(--space-4); font-size: var(--text-xs); color: var(--text-dim); }
+.menu-note.failed { color: var(--danger); }
+.code-editor { flex: 1; min-height: 0; }
+.code-errors { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--frame); background: var(--bg-raised); max-height: 30%; overflow-y: auto; }
+.code-error { display: flex; gap: var(--space-4); text-align: left; border: none; background: none; color: var(--danger); font-family: var(--mono); font-size: var(--text-s); padding: var(--space-1) var(--space-2); border-radius: var(--radius); cursor: pointer; }
+.code-error:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.code-error-line { color: var(--text-dim); flex-shrink: 0; }
+.code-errors-note { font-size: var(--text-xs); color: var(--text-dim); padding: var(--space-1) var(--space-2); }
+
+.device-dock { position: relative; flex-shrink: 0; display: flex; flex-direction: column; border-top: 1px solid var(--frame); background: var(--bg-raised); min-height: 0; }
+.device-dock > .splitter.horizontal { position: absolute; top: -3px; left: 0; right: 0; height: 5px; cursor: row-resize; background: transparent; z-index: 5; }
+.device-dock > .splitter.horizontal:hover, .device-dock > .splitter.horizontal:active { background: var(--accent); }
+/* Device and channel strip headers: the middle column (the preset selector) stays centred over the panel. */
+.dock-row { flex: 1; min-height: 0; display: flex; }
+/* The fader section at the dock's right end (docs/design/channel-strip.md, C7). */
+.track-fader {
+  flex: 0 0 112px; display: flex; flex-direction: column; gap: var(--space-3); min-height: 0; padding: var(--space-4) 10px var(--space-4) var(--space-5);
+  border-left: 1px solid var(--border); box-shadow: inset 3px 0 0 var(--track); background: var(--bg-raised);
+}
+.fader-switches { display: flex; gap: var(--space-2); }
+.fader-switches .switch { flex: 1; height: 20px; }
+.pan-slider { position: relative; height: 14px; border-radius: var(--radius); background: var(--lcd); border: 1px solid var(--border); cursor: ew-resize; touch-action: none; }
+.pan-centre { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; transform: translateX(-50%); background: var(--text-faint); }
+.pan-fill { position: absolute; top: 2px; bottom: 2px; background: var(--accent); border-radius: var(--radius-s); min-width: 2px; }
+/* Centred: the fill's minimum width straddles the centre instead of growing to its right. */
+.pan-fill.centred { transform: translateX(-50%); }
+.pan-readout { display: flex; justify-content: space-between; margin-top: -3px; font-family: var(--mono); font-size: var(--text-xs); color: var(--text-faint); }
+.pan-readout .value { color: var(--accent-ink); }
+.fader-body { flex: 1; min-height: 40px; display: flex; gap: var(--space-3); padding: var(--space-3) 0; }
+.fader-scale { position: relative; width: 22px; font-family: var(--mono); font-size: var(--text-xs); color: var(--text-faint); }
+.fader-scale span { position: absolute; right: 0; transform: translateY(50%); line-height: 1; }
+.track-fader .midi-learnable { display: flex; }
+.track-fader > .midi-learnable > .pan-slider { flex: 1; }
+.fader-body > .midi-learnable { flex: 0 0 22px; }
+.fader-track { position: relative; width: 22px; height: 100%; cursor: ns-resize; touch-action: none; }
+.fader-track::before { content: ''; position: absolute; left: 8px; width: 6px; top: 0; bottom: 0; border-radius: var(--radius); background: var(--lcd); border: 1px solid var(--border); }
+.fader-unity { position: absolute; left: 2px; right: 2px; height: 1px; background: var(--text-faint); }
+.fader-cap {
+  position: absolute; left: 0; width: 22px; height: 11px; transform: translateY(50%); border-radius: var(--radius);
+  background: var(--text); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.fader-cap::after { content: ''; position: absolute; left: 4px; right: 4px; top: 4.5px; height: 2px; background: var(--bg); }
+.meter.vertical { width: auto; flex-direction: column-reverse; align-items: center; gap: var(--space-2); }
+.meter.vertical .meter-lanes { display: flex; gap: var(--space-1); flex: 1; min-height: 0; }
+.meter.vertical .meter-lane { width: 4px; height: 100%; }
+.meter.vertical .meter-fill {
+  width: 100%; height: 100%; clip-path: inset(100% 0 0 0);
+  background: linear-gradient(0deg, var(--meter-low) 0%, var(--meter-low) 70%, var(--meter-mid) 85%, var(--meter-clip) 100%);
+}
+.fader-readout { font-family: var(--mono); font-size: var(--text-s); text-align: center; padding: var(--space-1) 0; border-radius: var(--radius); background: var(--lcd); border: 1px solid var(--border); cursor: ns-resize; }
+/* The device strip (docs/design/device-strip.md): cards side by side, scrolling sideways. */
+.device-strip { flex: 1; min-width: 0; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden; }
+/* The strip is a working area on the ground; the cards sit raised on it (DS7). */
+.device-strip-area { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--bg); }
+.device-strip:focus { outline: none; }
+.device-strip.drop { box-shadow: inset 0 0 0 2px var(--accent); }
+.strip-content { flex: 1 0 auto; min-height: 0; display: flex; flex-direction: column; }
+/* The cards sit inset from the dock's edges. */
+.strip-row { flex: 1; min-height: 0; display: flex; position: relative; padding: 0 var(--space-2); }
+/* On a custom graph the cards stand apart, and an arrow fills the gap between a card and the next it feeds, level with
+   their headers, touching both and going into neither. */
+/* A simple chain (D10): a gap before each effect, where one is added or a dragged card lands, and a slot to add one at
+   the end. */
+.strip-gap { flex: none; width: 14px; display: flex; justify-content: center; padding-top: var(--space-5); position: relative; }
+.strip-insert {
+  width: 14px; height: 14px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border-strong); border-radius: 50%; background: var(--bg); color: var(--text-dim); cursor: pointer;
+  opacity: 0; transition: opacity 120ms;
+}
+.strip-gap:hover .strip-insert, .strip-insert:focus-visible { opacity: 1; }
+.strip-insert:hover { color: var(--accent-ink); border-color: var(--accent); }
+.strip-gap.drop::after, .strip-add.drop::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: calc(50% - 1px); width: 2px; background: var(--accent);
+}
+.strip-add.drop::before { left: 0; }
+/* An add button in the strip: a + with a short word under it, read horizontally (docs/ui-review-2026-11-10.md, 3.13). */
+.strip-add {
+  flex: none; position: relative; width: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2);
+  margin: 8px 4px; padding: var(--space-3) var(--space-2); border: 1px dashed var(--border-strong); border-radius: var(--radius);
+  background: none; color: var(--text-dim); font-size: var(--text-xs); line-height: 1.2; text-align: center; cursor: pointer;
+}
+.strip-add span { white-space: normal; }
+/* In place of the effect button on a track that only feeds its output tracks (multi-output-instruments.md, MO12). */
+.strip-header-note { flex: none; align-self: center; width: 140px; margin: 8px 4px; color: var(--text-dim); font-size: var(--text-xs); line-height: 1.3; }
+.strip-add:hover { color: var(--accent-ink); background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.device-card.dragging { opacity: 0.4; }
+.device-card-header[draggable='true'] { cursor: grab; }
+.strip-step { position: absolute; top: 13.5px; pointer-events: none; overflow: hidden; }
+.strip-step path { fill: none; stroke: var(--text-dim); stroke-width: 1.4; stroke-linecap: butt; transition: opacity 120ms; }
+.strip-step.faded { opacity: 0.25; }
+/* The route line (D2): the cables between the cards of a custom graph. */
+.strip-route { flex: none; display: block; cursor: pointer; }
+.strip-cable { fill: none; stroke: var(--text-faint); stroke-width: 1.2; stroke-linejoin: round; transition: opacity 120ms; }
+.strip-route:hover .strip-cable { stroke: var(--text-dim); }
+.strip-cable.back { stroke: var(--warn); stroke-dasharray: 4 3; }
+.strip-cable.faded { opacity: 0.25; }
+.strip-empty { padding: 0 var(--space-5); }
+/* In a simple chain, cards with no gap between them (the modulated Gain, modulation sources) still stand apart. */
+.strip-row.simple .device-card + .device-card { margin-left: 4px; }
+.device-card {
+  flex: none; position: relative; display: flex; flex-direction: column; min-height: 0; margin: 8px 0;
+  border: 1px solid transparent; border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow-card); container-type: inline-size;
+}
+/* The selection line has the card's top 2 px to itself: the header's controls start below it. */
+.device-card { padding-top: var(--space-1); }
+.device-card.selected { box-shadow: inset 0 2px 0 var(--accent), var(--shadow-card); }
+.device-card.linked:not(.selected) { box-shadow: inset 0 2px 0 var(--text-faint), var(--shadow-card); }
+.device-card-loop { color: var(--warn); font-size: var(--text-s); line-height: 1; }
+.device-card-header { flex: none; display: flex; align-items: center; gap: var(--space-2); height: 20px; padding: 0 var(--space-3); }
+.device-card-header > * { flex: none; }
+/* Its controls fit inside it: the strip scrolls sideways, so anything above a card's top is cut off. */
+.device-card-header .preset-selector-button.small, .device-card-header select { height: var(--control-s); padding-top: 0; padding-bottom: 0; }
+.device-card-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-xs); font-weight: 600; }
+.device-card-header .badge.failed, .device-card-named .badge.failed { background: var(--danger); color: var(--on-accent); }
+/* A narrow card keeps its name readable before its presets. */
+@container (max-width: 250px) { .device-card-header .preset-selector-container { display: none; } }
+/* A size container, so square graphs can take the body's height as their width (cqh) and say what they need. */
+.device-card-body { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 0 var(--space-5) var(--space-2); container-type: size; }
+.device-card-body > .device-panel { flex: 1; min-width: 0; }
+.device-card.bypassed .device-card-body { opacity: 0.55; }
+.device-card-named { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3); font-size: var(--text-xs); }
+.device-card-named .dim { color: var(--text-dim); }
+.device-card-named .text-button { display: inline-flex; align-items: center; gap: var(--space-2); }
+.device-card-resize { position: absolute; top: 0; bottom: 0; right: -3px; width: 6px; cursor: col-resize; touch-action: none; z-index: 2; }
+.device-card-resize:hover, .device-card-resize:active { background: var(--accent); }
+/* Before the modulation sources (D3): they aren't in the signal path. */
+.strip-divider {
+  flex: none; width: 18px; display: flex; align-items: center; justify-content: center; margin: 8px 4px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+}
+/* A collapsed card's name is the one text written upwards: the card is too narrow for it any other way. */
+.device-card-expand {
+  writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.strip-divider { color: var(--text-faint); }
+/* A collapsed card (D5): its power switch over its name, which opens it again. */
+.device-card.collapsed { align-items: center; gap: var(--space-2); padding: var(--space-2) 0; }
+.device-card-expand {
+  flex: 1; min-height: 0; border: none; background: none; color: var(--text); font-size: var(--text-xs); font-weight: 600;
+  cursor: pointer; padding: 0; text-align: right;
+}
+.device-card-expand:hover { color: var(--accent-ink); }
+.device-card-collapse { margin-left: auto; opacity: 0.6; }
+.device-card-collapse:hover { opacity: 1; }
+/* Inside a component or Voice Instrument (D4): the way back and the path, at the strip's left edge as it scrolls. */
+.strip-scope {
+  flex: none; height: 24px; display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-3);
+  background: var(--bg-raised); border-bottom: 1px solid var(--border);
+}
+.strip-scope-path { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-xs); color: var(--text-dim); }
+/* The same breadcrumb as the graph's header: dim parents, underlined on hover, the current one bold. */
+.strip-scope-path .text-button { height: auto; padding: 0; border: none; background: none; color: inherit; cursor: pointer; }
+.strip-scope-path .text-button:hover { text-decoration: underline; }
+.strip-scope-path .text-button:hover, .strip-scope-path strong { color: var(--text); }
+.dock-empty { color: var(--text-dim); margin: 8px 0; }
+.dock-knobs { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); }
+
+.knob { display: flex; flex-direction: column; align-items: center; gap: 1px; width: 58px; user-select: none; }
+.knob svg { width: 32px; height: 32px; }
+.knob svg { cursor: ns-resize; touch-action: none; }
+.knob-track { fill: none; stroke: var(--border-strong); stroke-width: 3; stroke-linecap: round; }
+.knob-value { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.knob-pointer { stroke: var(--text); stroke-width: 2; stroke-linecap: round; }
+.knob-label { font-size: var(--text-xs); color: var(--text); max-width: 58px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.knob-value-text { font-family: var(--mono); font-size: var(--text-s); color: var(--text); white-space: nowrap; }
+
+.faust-controls { display: flex; }
+.faust-group { display: flex; flex-direction: column; gap: var(--space-2); }
+.faust-group-label { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); }
+.faust-group-items { display: flex; gap: var(--space-4) var(--space-6); }
+.faust-group.row > .faust-group-items { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
+.faust-group.column > .faust-group-items { flex-direction: column; }
+.faust-group.tabs { gap: var(--space-4); }
+.faust-slider { display: flex; align-items: center; gap: var(--space-4); min-width: 220px; }
+.faust-slider input { flex: 1; }
+.faust-slider.vertical { flex-direction: column; min-width: 0; }
+.faust-slider.vertical input { writing-mode: vertical-lr; direction: rtl; height: 100px; flex: none; }
+.faust-control-label { font-size: var(--text-xs); color: var(--text-dim); white-space: nowrap; }
+.faust-control-value { font-family: var(--mono); font-size: var(--text-s); min-width: 64px; }
+.faust-toggle, .faust-choice { display: flex; align-items: center; gap: var(--space-3); }
+.faust-bargraph { display: flex; align-items: center; gap: var(--space-3); min-width: 160px; }
+.faust-bargraph-track { position: relative; flex: 1; height: 6px; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius-s); overflow: hidden; }
+.faust-bargraph-fill { position: absolute; left: 0; bottom: 0; top: 0; background: var(--meter-low); }
+.faust-bargraph.vertical { flex-direction: column; min-width: 0; }
+.faust-bargraph.vertical .faust-bargraph-track { width: 8px; height: 100px; flex: none; }
+.faust-bargraph.vertical .faust-bargraph-fill { top: auto; right: 0; }
+
+/* Device panels (phase 11, P4) */
+.device-panel { display: flex; gap: var(--space-6); height: 100%; min-height: 0; }
+.panel-main { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; min-height: 0; flex: 1; }
+.panel-canvas { flex: 1; min-height: 0; width: 100%; border: 1px solid var(--border); border-radius: var(--radius); touch-action: none; cursor: crosshair; }
+/* Readouts under a graph (components/Readouts.tsx): labels and boxed values in a grid. */
+.readouts { display: grid; align-items: center; justify-content: start; gap: var(--space-2) var(--space-4); font-size: var(--text-xs); }
+.readouts .readout-label { color: var(--text-dim); white-space: nowrap; }
+
+.readouts .readout-value { display: flex; margin-right: 6px; }
+.readouts .value-text { display: inline-flex; align-items: center; min-width: 56px; height: 20px; box-sizing: border-box; padding: 1px var(--space-3) 0; border: 1px solid var(--border-strong); border-radius: var(--radius); background: var(--bg); color: var(--text); font-family: var(--mono); line-height: 1; text-decoration: none; white-space: nowrap; }
+.readouts .value-text:hover { border-color: var(--accent); color: var(--text); }
+.readouts input.value-text.editing { width: 64px; height: 20px; }
+.gate-readouts { display: flex; align-items: flex-start; gap: var(--space-4); }
+.gate-readouts .gate-light { margin-top: 6px; }
+.panel-readout { display: flex; gap: var(--space-6); font-family: var(--mono); font-size: var(--text-s); color: var(--text); min-height: 16px; }
+.panel-readout .dim { font-family: inherit; color: var(--text-dim); }
+.panel-readout-title { font-weight: 600; }
+.panel-side { display: flex; flex-direction: column; gap: var(--space-4); align-items: center; }
+.segmented.vertical { flex-direction: column; }
+.segmented.vertical button { border-right: none; border-bottom: 1px solid var(--border); }
+.segmented.vertical button:last-child { border-bottom: none; }
+/* The curve is square, its side set by CompressorPanel's measured layout; the columns beside it keep their width. */
+.compressor-panel .panel-main { flex: none; }
+.compressor-panel .panel-canvas { flex: none; }
+.compressor-panel .panel-sections, .compressor-panel > .gr-meter { flex: none; }
+.compressor-history { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+/* The history follows the body's height, down as well as up (flex: none would keep the canvas at its drawn size). */
+.compressor-history .panel-canvas { flex: 1 1 0; min-height: 0; }
+/* What fits beside the curve is measured (useCurveLayout in CompressorPanel.tsx): the history, else a gain-reduction meter,
+   and only outside a card, at the narrowest, no Sidechain column. */
+.compressor-panel > .gr-meter { display: none; }
+.compressor-panel:not(.fit-full) .compressor-history { display: none; }
+.compressor-panel:not(.fit-full) > .gr-meter { display: flex; }
+.compressor-panel.fit-compact .key-sections { display: none; }
+.compressor-legend { align-items: center; color: var(--text-dim); font-family: var(--font); font-size: var(--text-xs); }
+.compressor-legend .legend { display: inline-flex; align-items: center; gap: var(--space-3); }
+.compressor-legend .legend::before { content: ''; width: 10px; height: 2px; border-radius: 1px; }
+.compressor-legend .output::before { background: var(--meter-low); }
+.compressor-legend .input::before { height: 8px; background: var(--accent); opacity: 0.35; }
+.compressor-legend .reduction { font-family: var(--mono); color: var(--warn); }
+.compressor-legend .reduction::before { background: var(--warn); }
+.compressor-legend .key::before { background: var(--signal-key); }
+/* The compressor's key (docs/design/sidechain.md, K8). */
+.key-sections { min-width: 132px; }
+.key-sections .panel-section-items.column { gap: var(--space-4); align-items: flex-start; }
+.key-selector { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-dim); }
+.key-selector select { min-width: 0; max-width: 110px; }
+.key-switches { display: flex; gap: var(--space-2); }
+.key-switches .text-button { padding: 1px var(--space-4); font-size: var(--text-xs); }
+.key-late { font-size: var(--text-xs); color: var(--warn); }
+.compressor-legend .segmented { margin-left: auto; }
+.compressor-legend .segmented button { padding: 1px 7px; font-size: var(--text-xs); }
+/* Gate and Expander (docs/design/gate-expander.md, N14): the Compressor's layout, the Detector under Timing (beside it
+   when the body is too short for both), the open light. */
+@container (height < 176px) { .dynamics-panel .dynamics-sections { flex-direction: row; gap: var(--space-6); } }
+.dynamics-sections > .panel-section { min-width: max-content; }
+.dynamics-sections .panel-section-items.column { gap: var(--space-4); align-items: flex-start; }
+.dynamics-sections .segmented button { padding: 1px var(--space-4); font-size: var(--text-xs); }
+.dynamics-lookahead { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+.dynamics-lookahead select { height: var(--control); font-size: var(--text-xs); }
+.key-knobs { display: flex; gap: 0 4px; }
+.gate-light { flex: none; align-self: center; width: 8px; height: 8px; border-radius: 50%; background: var(--border-strong); }
+.gate-light.open { background: var(--ok); box-shadow: 0 0 4px var(--ok); }
+.gr-meter { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-dim); }
+.gr-meter-track { position: relative; flex: 1; width: 10px; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius-s); overflow: hidden; }
+.gr-meter-fill { position: absolute; top: 0; left: 0; right: 0; background: var(--warn); }
+/* As wide as the body is tall (at most 260 px) when there's room, narrowing with the card down to 96 px (or the height,
+   if that's less): the measured minimum (panelMinWidth.ts) is that floor. */
+.utility-panel .goniometer { flex: 0 1 min(260px, 100cqh); min-width: min(96px, 100cqh); max-width: min(260px, 100cqh); }
+.correlation { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-dim); }
+.correlation-track { position: relative; flex: 1; height: 6px; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius-s); overflow: hidden; }
+.correlation-fill { position: absolute; top: 0; bottom: 0; background: var(--meter-low); }
+.correlation-fill.negative { background: var(--danger); }
+.eq-panel { flex-direction: column; gap: var(--space-2); }
+.eq-graph { position: relative; flex: 1; min-height: 0; display: flex; }
+.eq-tooltip {
+  position: absolute; pointer-events: none; display: flex; flex-direction: column; gap: 1px; padding: var(--space-2) 7px;
+  background: color-mix(in srgb, var(--bg-float) 92%, transparent); border: 1px solid var(--band); border-radius: var(--radius);
+  font-family: var(--mono); font-size: var(--text-s); color: var(--text); white-space: nowrap;
+}
+.eq-tooltip-title { font-family: inherit; font-weight: 600; color: var(--band); }
+.eq-menu { width: 200px; }
+.eq-menu-header { display: flex; align-items: center; gap: var(--space-2); padding: 0 0 var(--space-2); }
+.eq-menu-header .menu-heading { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eq-menu-remove { color: var(--danger); }
+.eq-menu-field { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-2) var(--space-4); font-size: var(--text-xs); color: var(--text-dim); }
+.eq-menu-field select { height: 1.4rem; width: 112px; font-size: var(--text-xs); }
+.eq-menu-field input { height: 1.4rem; width: 112px; box-sizing: border-box; padding: 0 var(--space-3); font-family: var(--mono); font-size: var(--text-s); }
+.eq-legend { position: absolute; top: 6px; right: 8px; display: flex; gap: var(--space-4); pointer-events: none; font-size: var(--text-xs); font-weight: 600; }
+.eq-legend-mid { color: var(--tone-mid); }
+.eq-legend-side { color: var(--tone-side); }
+.filter-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+.filter-header .field select { height: var(--control); font-size: var(--text-xs); }
+/* Under the curve: Threshold and Ratio wrap onto two lines rather than run into the knobs beside it. */
+/* The readout takes the curve's width rather than widening the column past it. */
+.compressor-panel .panel-readout { flex-wrap: wrap; row-gap: 0; font-size: var(--text-xs); width: 0; min-width: 100%; }
+.compressor-panel .panel-readout span { white-space: nowrap; }
+
+
+/* Panel sections: a letter-spaced header with a rule across the group, then knob-sized slots. */
+.panel-sections { display: flex; flex-direction: column; gap: var(--space-4); }
+.panel-section { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.panel-section-header { display: flex; align-items: center; gap: var(--space-4); font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); line-height: 1; white-space: nowrap; }
+.panel-section-header::after { content: ''; flex: 1; min-width: 12px; height: 1px; background: var(--border-strong); }
+.panel-section-actions { order: 1; display: flex; gap: var(--space-1); letter-spacing: normal; text-transform: none; font-weight: 400; }
+/* Headers of one height, with or without actions, so the fields under them line up. */
+.step-sections .panel-section-header { height: 22px; }
+.step-field.wide { grid-column: span 2; }
+.panel-section-items { display: flex; align-items: flex-start; gap: 0 4px; }
+.panel-section-items.column { flex-direction: column; }
+.faust-group { gap: var(--space-4); }
+/* A toggle in a knob slot: a lit button that says what it is (docs/ui-review-2026-11-10.md, 1.7). */
+.slot-toggle { min-width: 40px; height: 32px; flex: none; padding: 0 var(--space-4); border: 1px solid var(--control-border); border-radius: var(--radius); background: var(--bg); color: var(--text-dim); font-size: var(--text-xs); cursor: pointer; }
+/* A few short choices side by side, and a stepper for small whole numbers (1.5, 1.6). */
+.knob.segmented-knob { width: auto; }
+.segmented-slot { display: flex; height: 32px; border: 1px solid var(--control-border); border-radius: var(--radius); overflow: hidden; }
+.segment { padding: 0 7px; border: 0; border-left: 1px solid var(--border-strong); background: var(--bg); color: var(--text-dim); font-size: var(--text-xs); white-space: nowrap; cursor: pointer; }
+.segment:first-child { border-left: 0; }
+.segment:hover { color: var(--text); }
+.segment.active { background: var(--accent); color: var(--on-accent); }
+.stepper-slot { display: flex; align-items: center; height: 32px; border: 1px solid var(--control-border); border-radius: var(--radius); background: var(--bg); }
+.stepper-button { display: flex; align-items: center; justify-content: center; width: 18px; height: 100%; padding: 0; border: 0; background: none; color: var(--text-dim); cursor: pointer; }
+.stepper-button:hover:not(:disabled) { color: var(--text); }
+.stepper-button:disabled { opacity: 0.35; cursor: default; }
+.knob .stepper-button svg { width: 12px; height: 12px; cursor: inherit; }
+.knob .segment svg, .knob .slot-toggle svg { width: auto; height: auto; cursor: inherit; }
+.stepper-value { min-width: 22px; text-align: center; font-family: var(--mono); font-size: var(--text-s); color: var(--text); }
+input.stepper-value { width: 34px; }
+/* A control that does nothing in the current mode (1.8). */
+.knob.inactive { opacity: 0.4; }
+/* Dimmed, still draggable: a value can be set before switching the mode that uses it (design-system.md, 6.1, 6). */
+
+/* MIDI effect panels (docs/design/midi-effects.md, section 7): a keyboard or the arpeggio's keys beside sections in a
+   row. The keyboard's keys share its width, so it shrinks with the card down to its floor and never covers a control. */
+.midi-effect-main { flex: 1 1 0; min-width: 96px; }
+.midi-effect-sections { flex: none; flex-direction: row; gap: var(--space-6); align-content: start; }
+/* The step sequencer (docs/design/step-sequencer.md, SS9): the grid fills what the sections leave. */
+.step-grid-main { flex: 1 1 auto; min-width: 260px; }
+.step-grid { width: 100%; height: 100%; min-height: 0; display: block; cursor: pointer; }
+.step-sections { flex: none; flex-direction: row; gap: var(--space-6); align-content: start; }
+.step-sections .panel-section-items.column { row-gap: var(--space-4); }
+.step-patterns { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); min-height: 24px; }
+.step-pattern { min-width: 20px; padding: 0 var(--space-2); }
+.step-pattern.active { color: var(--accent-ink); border-color: var(--accent); }
+.step-row-fields { display: flex; align-items: center; gap: var(--space-3); }
+.step-row-name { width: 110px; height: 24px; margin: 0; }
+.step-fields { display: grid; grid-template-columns: repeat(2, auto); justify-content: start; gap: var(--space-3) var(--space-4); }
+.step-field { display: flex; flex-direction: column; gap: var(--space-1); font-size: var(--text-xs); color: var(--text-dim); }
+.step-field select { height: var(--control); }
+.drag-number.number-box { display: inline-flex; align-items: center; min-width: 56px; height: var(--control); box-sizing: border-box; padding: 1px var(--space-3) 0; line-height: 1; border: 1px solid var(--control-border); border-radius: var(--radius); background: var(--bg); color: var(--text); font-family: var(--mono); font-size: var(--text-s); cursor: ns-resize; }
+input.drag-number.editing.number-box { width: 56px; height: var(--control); }
+
+.menu-row { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) 10px; font-size: var(--text-s); }
+.menu-row-label { color: var(--text-dim); min-width: 64px; }
+.step-clip-patterns { flex-wrap: wrap; max-width: 260px; }
+.mini-keyboard { flex: 1; min-height: 28px; display: flex; gap: 1px; align-items: flex-start; }
+.mini-key { flex: 1 1 0; min-width: 3px; height: 100%; padding: 0; border: 1px solid var(--border-strong); border-radius: var(--radius-s);
+  background: var(--bg); cursor: pointer; position: relative; }
+.mini-key:disabled { cursor: default; }
+.mini-key.black { height: 62%; background: var(--border-strong); }
+.mini-key.lit { background: var(--accent); border-color: var(--accent); }
+.mini-key.black.lit { background: color-mix(in srgb, var(--accent) 70%, black); }
+.mini-key.marked::after { content: ''; position: absolute; left: 50%; bottom: 4px; width: 4px; height: 4px; margin-left: -2px;
+  border-radius: 50%; background: var(--text); }
+.mini-key:not(:disabled):hover { border-color: var(--accent); }
+.arp-keys { flex: 1; min-height: 28px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: var(--space-2); overflow: hidden;
+  border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-3); }
+.arp-key { font-family: var(--mono); font-size: var(--text-xs); padding: var(--space-1) var(--space-3); border-radius: var(--radius); border: 1px solid var(--border-strong);
+  color: var(--text-dim); }
+.arp-key.lit { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.arp-empty { color: var(--text-dim); font-size: var(--text-xs); }
+
+/* Loop Reverb panel */
+.loop-reverb-panel .panel-main { flex: 1 1 auto; min-width: 160px; }
+.loop-reverb-seed { display: flex; align-items: center; gap: var(--space-4); }
+.loop-reverb-seed .drag-number { min-width: 64px; }
+.loop-reverb-groups { flex: 0 0 auto; display: grid; grid-template-columns: repeat(3, auto); gap: var(--space-4) var(--space-6); align-content: start; }
+.convolution-panel .panel-main { flex: 1 1 auto; min-width: 160px; }
+.convolution-main { border-radius: var(--radius); }
+.convolution-main.dropping .panel-canvas { border-color: var(--accent); }
+.convolution-header { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.convolution-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-s); }
+.convolution-name.missing { color: var(--danger); }
+.convolution-rt { flex: none; color: var(--text-dim); font-size: var(--text-xs); font-variant-numeric: tabular-nums; margin-left: 6px; }
+.convolution-groups { flex: 0 0 auto; display: flex; flex-direction: column; gap: var(--space-4); }
+.convolution-row { display: flex; gap: var(--space-6); }
+/* Too short for two rows of knobs (each about 84 px): one row, and the card grows to fit it (device-strip.md, D5). */
+@container (height < 176px) {
+  .convolution-groups { flex-direction: row; gap: var(--space-6); }
+}
+
+/* Chorus, Flanger and Phaser panels: the sweep beside two rows of sections (LFO and Output, then the delay or sweep),
+   one row when the body is too short for two rows of knobs (docs/design/modulation-effects.md, the panels). */
+.modfx-panel .panel-main { flex: 1 1 auto; min-width: 160px; }
+.modfx-header { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.modfx-header .field select { height: var(--control); font-size: var(--text-xs); }
+.modfx-sections { flex: none; display: grid; grid-template-columns: auto auto; gap: var(--space-4) var(--space-6); align-content: start; }
+.modfx-sections > .panel-section:last-child { grid-column: 1 / -1; }
+/* Sections keep their knobs' width, so the panel's min-content width (what the card measures) includes them. */
+.modfx-sections > .panel-section { min-width: max-content; }
+.modfx-select { flex-direction: column; align-items: flex-start; gap: var(--space-2); margin-left: 8px; }
+.modfx-select select { height: var(--control); font-size: var(--text-xs); }
+@container (height < 176px) {
+  .modfx-sections { grid-template-columns: none; grid-auto-flow: column; }
+  .modfx-sections > .panel-section:last-child { grid-column: auto; }
+}
+
+/* Delay and limiter panels */
+.delay-header { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.delay-header .field select { height: var(--control); font-size: var(--text-xs); }
+
+/* Saturator panel */
+/* The curve is square. Its column would like to be as wide as the body is tall under the oversampling choice (22 px
+   and a 4 px gap), and narrows when the card does, down to 120 px (or the height, if that's less): the measured
+   minimum (panelMinWidth.ts) is that floor, so the knobs never reach the curve. */
+.saturator-panel .panel-main {
+  flex: 0 1 calc(100cqh - 26px); min-width: min(120px, calc(100cqh - 26px)); max-width: calc(100cqh - 26px);
+}
+.saturator-panel .panel-canvas { flex: none; width: 100%; height: auto; aspect-ratio: 1; }
+.saturator-panel .segmented { align-self: flex-start; height: 22px; box-sizing: border-box; }
+.clipper-panel .panel-main { flex: 1 1 auto; min-width: 120px; }
+.clipper-panel .panel-canvas { flex: 1 1 0; width: 100%; border: none; }
+.clipper-panel .panel-sections { flex: none; }
+.clipper-panel .segmented { align-self: flex-start; }
+/* Bit Crusher panel: the graph (transfer curve and scope) beside two rows of sections (Bits and Rate over Output and
+   Filters), one row when the body is too short for two rows of knobs (docs/design/bit-crusher.md, section 4). */
+.bitcrusher-panel .panel-main { flex: 1 1 auto; min-width: 176px; }
+.bitcrusher-panel .panel-canvas { border: none; }
+.bitcrusher-sections { flex: none; display: grid; grid-template-columns: auto auto; gap: var(--space-5) var(--space-7); align-content: start; }
+.bitcrusher-sections > .panel-section { min-width: max-content; }
+@container (height < 176px) {
+  .bitcrusher-sections { grid-template-columns: none; grid-auto-flow: column; }
+}
+.waveshaper-panel .panel-main { flex: 1 1 auto; min-width: 120px; }
+.waveshaper-panel .panel-sections { flex: none; }
+.waveshaper-header { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+.waveshaper-shape { height: 22px; max-width: 100%; font-size: var(--text-xs); padding: 0 var(--space-1); }
+.waveshaper-plot { position: relative; flex: 1 1 0; min-height: 0; }
+.waveshaper-plot .panel-canvas { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+.waveshaper-editor { position: absolute; left: 0; top: 0; touch-action: none; cursor: crosshair; }
+.waveshaper-curve { fill: none; stroke: var(--accent); stroke-width: 2; pointer-events: none; }
+.waveshaper-point { fill: var(--accent); stroke: var(--bg); stroke-width: 1; cursor: grab; }
+.waveshaper-point.selected { fill: var(--text); stroke: var(--accent); stroke-width: 1.5; }
+.waveshaper-handle { fill: var(--bg); stroke: var(--accent); stroke-width: 1; cursor: move; }
+.waveshaper-presets { display: flex; flex-wrap: wrap; gap: 0 6px; }

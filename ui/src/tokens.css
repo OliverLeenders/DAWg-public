@@ -1,0 +1,169 @@
+/* DAWg's design tokens (docs/design/design-system.md, DS1–DS9), defined once. Everything else reads them: the
+   stylesheets through var(), the canvases through canvas/theme.ts, which reads these same properties.
+
+   The colours start from Typewright's dark theme (FontEditor/apps/editor/src/styles/tokens.css), so the two apps look
+   alike; the names are DAWg's, named by role, and a colour's comment notes the Typewright token it follows. Two
+   tokens may hold the same value today (audio and ok are both green): they are apart so that one can change without
+   the other (DS2). */
+
+:root {
+  /* Surfaces, by elevation: lighter is higher (DS7). */
+  --bg: #0d1218;          /* level 0, canvases; --ground */
+  --bg-raised: #151c24;   /* level 1, panels and bars; --surface */
+  --bg-panel: #1b242e;    /* level 2, strips, rows, control fills; --surface-2 */
+  --bg-card: #212b37;     /* level 2, a device card: a step up, so it stands off the strip it sits in */
+  --bg-float: #232e3a;    /* level 3, menus, popovers, dialogs, toasts */
+  --bg-hover: #212b36;    /* a state's fill that isn't hover: a picked tab, a filled pad */
+  --hover-overlay: rgba(255, 255, 255, 0.04); /* hover on any level, over the element's own fill */
+  --lcd: #10171f;         /* wells: displays, graphs, meters; --canvas */
+  --selected: var(--accent-soft); /* a row picked out of a list */
+
+  /* Rules. */
+  --border: #232d38;      /* --rule */
+  --border-strong: #33404e; /* --rule-strong */
+  --frame: #2b3643;       /* the lines between regions; --rule-frame */
+  --control-border: #64717f; /* a control's boundary: fields, selects, switches, segments; 3:1 on its surface */
+
+  /* Ink. */
+  --text: #e5ebf2;        /* --ink */
+  --text-dim: #98a6b6;    /* --ink-2 */
+  --text-faint: #8592a0;  /* 4.5:1 on --bg-panel (DS15); Typewright's --ink-3 is #74828f */
+
+  /* The accent: what is chosen, focused or edited. */
+  --accent: #74aee2;      /* --accent */
+  --accent-ink: #a6ccee;  /* --accent-ink */
+  --accent-soft: #142838; /* --accent-soft */
+  --on-accent: #0d1218;   /* text on any filled colour */
+
+  /* Status. */
+  --ok: #74c08a;          /* --ok: playing, activity, a compile that worked */
+  --warn: #e8b84e;        /* amber, apart from the events' orange and from mute */
+  --danger: #e2776e;      /* --danger */
+  --warn-surface: rgba(214, 160, 90, 0.08);
+  --warn-rule: #6b5520;   /* --warn-rule */
+  --warn-ink: #f2e3c4;    /* --warn-ink */
+  --danger-surface: #2a1414;
+  --danger-rule: #8a2c2c;
+  --danger-ink: #f6d6d6;
+  --danger-icon: #ff8a8a;
+  /* Something that is on: a device's power, a send, a node's button. Not green: green is audio and level (DS2). */
+  --on: var(--accent-ink);
+
+  /* Signals: the colour of a port, its cables and what it carries. */
+  --signal-audio: #74c08a;
+  --signal-events: #d6a05a;
+  --mod: #b58cff;         /* modulation: ports, cables, LFO and envelope curves (docs/design/modulation.md) */
+  --mod-ink: #c9b3ff;     /* modulation text */
+  --mod-point: #d9c8ff;   /* modulation curve points */
+  --signal-key: #ee8fc6;  /* sidechain sends and key inputs: pink, apart from --mod's violet */
+
+  /* Tones: the parts of a split signal (docs/design/split-nodes.md, section 6) and the EQ's mid and side. */
+  --tone-1: #5aa9e6;      /* the lowest band */
+  --tone-2: #40b8c8;      /* cyan: a green would read as a plain audio port */
+  --tone-3: #e6c35a;
+  --tone-4: #e2896e;      /* the highest band */
+  --tone-left: #5aa9e6;
+  --tone-right: #e2896e;
+  --tone-mid: #ff8f4a;    /* the EQ's mid curve and bands (channel-strip.md, C8) */
+  --tone-side: #b9a4ff;   /* the EQ's side curve and bands: warm against cool, apart from the mid's */
+  --tone-dry: var(--text-dim);
+
+  /* Track switches. */
+  --mute: #e0904f;        /* redder than the events' orange and the touch mode */
+  --solo: #e0c372;
+  --arm: var(--danger);
+  --monitor: #74c08a;
+  --automation-read: #74c08a;
+  --automation-touch: #d6a05a; /* touch and latch */
+  --automation-write: var(--danger);
+  --learn: #d6a05a;       /* MIDI learn and a mapped control */
+  --link: #6cc4d8;        /* parameter links: a control that drives or follows another (parameter-linking.md) */
+
+  /* Timelines: the arrangement, the editors and their rulers. */
+  --playhead: #74c08a;
+  --marker: #d6a05a;      /* markers, a key or signature change */
+  --punch: var(--danger); /* the punch range */
+  --warp-marker: #e8c46a; /* an audio file's timing markers */
+  --transient: #c9b8a4;   /* detected onsets */
+  --key-white: #aeb8c3;   /* the piano keyboard: grey, so notes stay the brightest thing in the roll */
+  --key-black: var(--bg-panel);
+  --key-label: #3a4552;   /* a C's name on a white key */
+
+  /* The EQ's bands: the low and high cuts, and the six bands from low to high (their handles, curves and menus). */
+  --eq-cut: var(--text-dim);
+  --eq-band-1: #d6a05a;
+  --eq-band-2: #74c08a;
+  --eq-band-3: #a6ccee;
+  --eq-band-4: #c9a3e0;
+  --eq-band-5: #d8c66a;
+  --eq-band-6: #e2776e;
+
+  /* The code view's syntax colours (faust/monaco.ts). */
+  --syntax-comment: #6f7f90;
+  --syntax-string: #74c08a;
+  --syntax-number: #d6a05a;
+  --syntax-keyword: var(--accent);
+  --syntax-type: var(--accent-ink);
+  --syntax-operator: #e2776e;
+  --syntax-gutter: #4a5868; /* line numbers */
+
+  /* Node categories: a graph node's top border, a browser badge. */
+  --category-instrument: var(--accent);
+  --category-effect: #6e9a7b; /* a quiet green: the node's ports carry the audio green */
+  --category-utility: #e0c372;
+  --category-io: #74828f;
+
+  /* Meters: the gradient's low, mid and clipping ends, and an input's low end. */
+  --meter-low: #74c08a;
+  --meter-mid: #e8c36a;
+  --meter-clip: var(--danger);
+  --meter-input: #d49af5;
+
+  /* Elevation (DS7). */
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.35), 0 10px 28px -14px rgba(0, 0, 0, 0.8); /* floating things */
+  /* A card on a working area: a lit top edge, which carries most of it on a dark ground, and a short, close shadow. */
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.6), 0 6px 14px -6px rgba(0, 0, 0, 0.9);
+  /* A working area sunk below the panels around it (Typewright's inset, tuned for a near-black ground): a dark rim, a
+     short shadow under its top edge and a weaker one over its bottom. */
+  --shadow-inset: inset 0 1px 0 rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(0, 0, 0, 0.35), inset 0 12px 14px -12px rgba(0, 0, 0, 0.95), inset 0 -12px 14px -12px rgba(0, 0, 0, 0.6);
+  --scroll-fade: 48px;    /* how far a scroll area's content fades where more of it is hidden */
+  --scrim: rgba(0, 0, 0, 0.5);
+  --z-sticky: 5;          /* parts of a view that stay over its content */
+  --z-dialog: 20;
+  --z-popover: 30;        /* menus and popovers, over a dialog they open from */
+  --z-toast: 50;
+
+  /* Type (DS3). The root is 13 px. */
+  --font: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  --text-xs: 11px;        /* control labels, small capitals, axis and scale labels */
+  --text-s: 12px;         /* values (in --mono), dense lists */
+  --text-m: 13px;         /* body, menus, rows, track names, buttons with words */
+  --text-l: 15px;         /* dialog titles, the position display */
+  --text-xl: 18px;        /* the brand, the welcome heading */
+
+  /* Spacing (DS4), control heights (DS5), radii (DS6), icons (DS9). */
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+  --space-5: 12px;
+  --space-6: 16px;
+  --space-7: 24px;
+  --control-s: 18px;
+  --control: 24px;
+  --control-l: 28px;
+  --radius-s: 2px;
+  --radius: 3px;
+  --radius-l: 6px;
+  --radius-round: 999px;
+  --icon-s: 12px;
+  --icon: 14px;
+  --icon-l: 16px;
+
+  /* Motion (DS8). */
+  --ease: ease-out;
+  --duration: 120ms;
+  --duration-enter: 200ms;
+  --disabled: 0.5;
+}

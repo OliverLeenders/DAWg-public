@@ -1,0 +1,142 @@
+/* Menus, dialogs, toasts and the welcome screen (phase 5).
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Project workflow (phase 5) --------------------------------------------- */
+.project-controls { display: contents; }
+.project-name {
+  display: inline-flex; align-items: center; gap: var(--space-3); max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-dim);
+}
+.dirty-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.file-menu { position: relative; }
+.file-menu-popup { min-width: 230px; }
+.menu-item.with-shortcut { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); }
+.menu-item:disabled { opacity: 0.4; cursor: default; background: none; }
+kbd { font-family: var(--mono); font-size: var(--text-xs); color: var(--text-dim); }
+.submenu { position: relative; }
+.submenu-popup { left: 100%; top: -4px; max-width: 320px; }
+.submenu-popup .menu-item { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A Submenu (ui/overlays.tsx): placed at a point in the window, beside its row; a long one scrolls. */
+.submenu-popup.fixed { overflow-y: auto; }
+.submenu-row { display: flex; align-items: center; gap: var(--space-4); }
+.submenu-row .submenu-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.submenu-row .submenu-detail { font-size: var(--text-xs); color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.submenu-row.open { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: var(--z-dialog); display: grid; place-items: center; background: var(--scrim);
+}
+.modal {
+  width: 420px; max-width: calc(100vw - 32px); padding: var(--space-6) 20px 14px; display: grid; gap: var(--space-4);
+  background: var(--bg-float); border: 1px solid var(--border-strong); border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.modal h3 { margin: 0; font-size: var(--text-l); font-weight: 600; }
+.modal p { margin: 0; color: var(--text-dim); line-height: 1.45; }
+.modal-buttons { display: flex; gap: var(--space-4); margin-top: 6px; }
+/* Help > Keyboard and mouse (components/shortcuts.ts): the areas on the left, one area's mouse and keys on the right. */
+.modal.shortcut-reference { width: 600px; outline: none; }
+.shortcut-body { display: grid; grid-template-columns: 130px 1fr; gap: var(--space-6); min-height: 340px; }
+.shortcut-areas { display: flex; flex-direction: column; gap: var(--space-1); border-right: 1px solid var(--border); padding-right: 10px; }
+.shortcut-areas button {
+  text-align: left; padding: var(--space-3) var(--space-4); border: none; border-radius: var(--radius); background: none; color: var(--text-dim);
+  font: inherit; font-size: var(--text-s); cursor: pointer;
+}
+.shortcut-areas button:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); color: var(--text); }
+.shortcut-areas button.active { background: var(--bg-hover); color: var(--text); }
+.shortcut-tables { display: grid; gap: var(--space-6); align-content: start; }
+.shortcut-tables h4 { margin: 0 0 6px; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }
+.shortcut-tables dl { margin: 0; display: grid; gap: var(--space-2); }
+.shortcut-tables dl > div { display: grid; grid-template-columns: 190px 1fr; gap: var(--space-5); font-size: var(--text-s); line-height: 1.35; }
+.shortcut-tables dt { color: var(--text); }
+.shortcut-tables dd { margin: 0; color: var(--text-dim); }
+.modal-field { display: grid; gap: var(--space-3); color: var(--text-dim); font-size: var(--text-xs); }
+.modal-field .search { margin: 0; }
+.text-button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.text-button.primary:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.text-button.primary.danger { background: var(--danger); border-color: var(--danger); }
+
+.welcome {
+  flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(260px, 340px) minmax(0, 640px);
+  grid-template-rows: auto 1fr; justify-content: center; gap: 24px 48px; padding: 48px 32px 32px; overflow: auto;
+}
+.output-mute-banner {
+  position: fixed; top: 56px; left: 50%; transform: translateX(-50%); z-index: var(--z-toast); max-width: min(720px, 90vw);
+  display: flex; align-items: center; gap: var(--space-4); padding: 10px 14px; border-radius: var(--radius);
+  border: 1px solid var(--danger-rule); background: var(--danger-surface); color: var(--danger-ink); box-shadow: var(--shadow);
+}
+.output-mute-banner .text-button { flex: none; }
+.alt-drag-notice {
+  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%); z-index: var(--z-toast); max-width: min(760px, 92vw);
+  display: flex; align-items: center; gap: var(--space-4); padding: 10px 14px; border-radius: var(--radius); line-height: 1.45;
+  border: 1px solid var(--border-strong); background: var(--bg-float); color: var(--text); box-shadow: var(--shadow);
+}
+.alt-drag-notice svg { flex: none; color: var(--accent); }
+.error-toast {
+  position: fixed; right: 16px; bottom: 36px; z-index: var(--z-toast); max-width: min(460px, 90vw);
+  display: flex; align-items: flex-start; gap: var(--space-4); padding: var(--space-4) 10px var(--space-4) var(--space-5); border-radius: var(--radius); line-height: 1.4;
+  border: 1px solid var(--danger-rule); background: var(--danger-surface); color: var(--danger-ink); box-shadow: var(--shadow); font-size: var(--text-s);
+  animation: toast-in 160ms ease-out;
+}
+.error-toast svg { flex: none; margin-top: 1px; color: var(--danger-icon); }
+.error-toast span { flex: 1; }
+.error-toast.hint { border-color: var(--accent); background: var(--bg-float); color: var(--text); }
+.error-toast.hint svg { color: var(--accent); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(6px); } }
+.alt-drag-notice .text-button { flex: none; }
+.update-pill {
+  position: fixed; left: 16px; bottom: 36px; z-index: var(--z-toast);
+  display: inline-flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 10px; border-radius: var(--radius-round); font-size: var(--text-s);
+  border: 1px solid var(--border-strong); background: var(--bg-float); color: var(--text); box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.update-pill svg { color: var(--accent); }
+.update-pill:hover { border-color: var(--accent); }
+.update-dialog { width: min(560px, 92vw); }
+.update-notes {
+  max-height: 320px; overflow: auto; margin: 8px 0 0; padding: 10px var(--space-5); white-space: pre-wrap; font-family: inherit;
+  font-size: var(--text-s); line-height: 1.5; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.recovery-banner {
+  grid-column: 1 / -1; display: flex; align-items: center; gap: var(--space-4); padding: 10px 14px;
+  border: 1px solid var(--warn-rule); background: var(--warn-surface); border-radius: var(--radius); color: var(--warn-ink);
+}
+.welcome-start { display: flex; flex-direction: column; gap: var(--space-4); }
+.welcome-start h1 { display: flex; align-items: center; gap: var(--space-5); font-size: 40px; margin-bottom: 16px; }
+.welcome-start h1 span span { color: var(--accent); }
+.welcome-start h2, .welcome-recent h2 { margin-top: 18px; display: inline-flex; align-items: center; gap: var(--space-3); }
+.welcome-action {
+  display: flex; align-items: center; gap: var(--space-4); padding: 10px var(--space-5); font-size: var(--text-m); text-align: left;
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer;
+}
+.welcome-action:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); border-color: var(--border-strong); }
+.welcome-action kbd { margin-left: auto; }
+.template-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-4); }
+.template-card {
+  display: grid; justify-items: center; gap: var(--space-4); padding: 14px var(--space-4); color: var(--text-dim);
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer;
+}
+.template-card span { color: var(--text); font-size: var(--text-s); overflow: hidden; text-overflow: ellipsis; max-width: 100%; white-space: nowrap; }
+.template-card:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); border-color: var(--accent); color: var(--accent); }
+.welcome-recent { min-width: 0; display: flex; flex-direction: column; min-height: 0; }
+.welcome-recent-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); }
+.welcome-recent-header h2 { margin-top: 0; }
+.welcome-recent-header .search { margin: 0; width: 220px; }
+.welcome-recent { padding-top: 64px; }
+.recent-list { margin-top: 10px; display: grid; gap: var(--space-1); }
+.recent-row {
+  position: relative; display: grid; grid-template-columns: 1fr auto; column-gap: var(--space-5); row-gap: var(--space-1);
+  padding: var(--space-4) 10px; border-radius: var(--radius); cursor: pointer;
+}
+.recent-row:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.recent-name { font-size: var(--text-m); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-date { color: var(--text-dim); font-size: var(--text-xs); text-align: right; }
+.recent-folder { color: var(--text-dim); font-size: var(--text-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-summary { color: var(--text-dim); font-size: var(--text-xs); font-family: var(--mono); text-align: right; }
+.recent-row.missing { cursor: default; }
+.recent-row.missing .recent-name, .recent-row.missing .recent-summary { opacity: 0.45; }
+.recent-row.missing .recent-date { color: var(--warn); }
+.recent-remove { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
+.recent-row.missing .recent-summary { visibility: hidden; }
+.welcome .spacer, .modal-buttons .spacer { flex: 1; }

@@ -1,0 +1,23 @@
+/* Depth: working areas and scroll fades (DS7).
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Depth (docs/design/design-system.md, DS7) ------------------------------- */
+/* A working area (the arrangement's lanes, the graph, the roll, the dock's strip, the mixer's strips) is sunk below the
+   panels around it: an inset shadow on an overlay of its own, above its content and never in the pointer's way. */
+.working-area, .arrangement-lanes, .graph-canvas { position: relative; }
+.working-area::after, .arrangement-lanes::after, .graph-canvas::after {
+  content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; box-shadow: var(--shadow-inset);
+}
+/* A scroll area's content fades out at an edge where more of it is hidden (ui/useScrollFade.ts). */
+@property --fade-start { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --fade-end { syntax: '<length>'; inherits: false; initial-value: 0px; }
+.scroll-fade {
+  --fade-start: 0px; --fade-end: 0px;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent 100%);
+  transition: --fade-start var(--duration) var(--ease), --fade-end var(--duration) var(--ease);
+}
+.scroll-fade[data-more-start] { --fade-start: var(--scroll-fade); }
+.scroll-fade[data-more-end] { --fade-end: var(--scroll-fade); }
+@media (prefers-reduced-motion: reduce) { .scroll-fade { transition: none; } }

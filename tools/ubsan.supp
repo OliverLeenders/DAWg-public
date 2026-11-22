@@ -1,0 +1,5 @@
+# UndefinedBehaviorSanitizer suppressions for the sanitizer CI job (.github/workflows/ci.yml).
+# Faust's C glue calls its UI callbacks through a base class it never derives from; third-party code.
+vptr:CGlue.h
+# Faust's compiler converts infinite interval bounds to int while working out precisions; third-party code.
+float-cast-overflow:*/compiler/interval/*

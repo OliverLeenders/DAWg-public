@@ -1,0 +1,6 @@
+/**
+    @namespace dawg
+
+    Everything in DAWg: the GUI-free engine (model, commands, session, audio engine) and the app layer
+    (window, web bridge, plugin scanning).
+*/

@@ -1,0 +1,13 @@
+build/
+build-*/
+out/
+.vs/
+.vscode/
+.idea/
+*.user
+.DS_Store
+.cpm-cache/
+.tools/
+__pycache__/
+*.tsbuildinfo
+.aider*

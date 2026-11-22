@@ -1,0 +1,86 @@
+/* The design system's controls (ui/controls.tsx; docs/design/design-system.md, DS5, DS10–DS12). One look per job, the
+   same states everywhere: rest, hover (an overlay), pressed or on (DS11), keyboard focus (the ring in styles/devices.css),
+   disabled. Views may place and space these, but not restyle them. */
+
+/* Buttons: words, or a square icon. Three heights: small 18 px, the default 24 px, large 28 px. */
+.text-button, .icon-button {
+  height: var(--control); border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-panel); color: var(--text); cursor: pointer;
+  transition: background-color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+}
+.text-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  padding: 0 var(--space-4); font-size: var(--text-xs); white-space: nowrap;
+}
+.icon-button { width: var(--control); padding: 0; display: grid; place-items: center; }
+.text-button.small, .icon-button.small { height: var(--control-s); }
+.icon-button.small { width: var(--control-s); }
+.text-button.small { padding: 0 var(--space-3); }
+.text-button.large, .icon-button.large { height: var(--control-l); }
+.icon-button.large { width: var(--control-l); }
+.text-button.large { padding: 0 var(--space-5); font-size: var(--text-m); }
+.text-button:hover:not(:disabled), .icon-button:hover:not(:disabled) {
+  background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); border-color: var(--border-strong);
+}
+.text-button:disabled, .icon-button:disabled { opacity: var(--disabled); cursor: default; }
+.text-button.ghost, .icon-button.ghost { border-color: transparent; background-color: transparent; }
+.text-button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.text-button.danger, .icon-button.danger { color: var(--danger); }
+
+/* Pressed (DS11). On or off: the accent's tint and an accent border. One of several (a view, a mode): the whole
+   accent. `.active` is the older name of each, kept while the views move over. */
+.toggle.on, .icon-button.active {
+  background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink);
+}
+.text-button.active, .icon-button.chosen, .text-button.chosen {
+  background: var(--accent); border-color: var(--accent); color: var(--on-accent);
+}
+
+/* A device's or a send's power: an icon, lit in the accent's ink while on, faint while bypassed (DS2). */
+.power {
+  flex: none; width: var(--control); height: var(--control); padding: 0; display: grid; place-items: center;
+  border: 1px solid transparent; border-radius: var(--radius); background: none; color: var(--text-faint); cursor: pointer;
+}
+.power.small { width: var(--control-s); height: var(--control-s); }
+.power.on { color: var(--on); }
+.power:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); border-color: var(--border-strong); color: var(--text); }
+.power.on:hover { color: var(--on); }
+
+/* A native select at the control heights, with a drawn chevron. */
+select.small { height: var(--control-s); font-size: var(--text-xs); padding-top: 0; padding-bottom: 0; }
+select.large { height: var(--control-l); }
+
+/* An overlay takes the focus when it opens (ui/overlays.tsx) so Escape and the arrows reach it; the box itself shows
+   no ring, the items inside it do. */
+[role='menu']:focus, .context-menu:focus, .plugin-picker:focus, .toolbar-popover:focus, .modal:focus { outline: none; }
+
+/* A bar of groups that never wraps (ui/Bar.tsx, DS14): groups that don't fit fold into the "⋯" menu. */
+.bar { display: flex; align-items: center; flex-wrap: nowrap; min-width: 0; overflow: hidden; }
+.bar-item { flex: none; display: flex; align-items: center; align-self: stretch; gap: inherit; }
+.bar-grow { flex: 1 1 auto; min-width: 24px; }
+.bar-grow > .spacer { flex: 1; align-self: stretch; }
+.bar-overflow { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); padding: var(--space-4); }
+.bar-overflow-group { display: flex; align-items: center; gap: var(--space-3); }
+.bar-overflow-group .group { flex-wrap: wrap; }
+/* A view's own groups keep their row in the menu (the roll's grid, scale and tools). */
+.bar-overflow .toolbar-group { display: flex; align-items: center; gap: var(--space-4); }
+
+/* Tabs (ui/Tabs.tsx): view tabs are words with an accent underline; lane tabs are raised into the lane they show. */
+.tabs { display: flex; min-width: 0; }
+.tabs .tab { flex: none; background: none; border: 1px solid transparent; color: var(--text-dim); cursor: pointer; white-space: nowrap; }
+.tabs .tab:hover { color: var(--text); }
+.tabs.view { gap: var(--space-5); align-self: stretch; align-items: stretch; }
+.tabs.view .tab { padding: 0 var(--space-1); border-width: 0 0 2px; border-radius: 0; font-size: var(--text-m); font-weight: 600; }
+.tabs.view .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.tabs.lane { gap: var(--space-1); align-items: end; }
+.tabs.lane .tab { height: var(--control); padding: 0 var(--space-5); border-bottom: none; border-radius: var(--radius) var(--radius-l) 0 0; }
+.tabs.lane .tab.active { background: var(--bg); border-color: var(--border); color: var(--text); }
+
+/* The note over a frequency field while it is typed in (components/ValueText.tsx, DS17): over it, as the fields that take
+   one sit at the foot of their panels, where a card would clip anything below. */
+.value-text-field { position: relative; display: inline-block; }
+.value-hint {
+  position: absolute; bottom: calc(100% + 3px); left: 50%; transform: translateX(-50%); z-index: var(--z-popover); pointer-events: none;
+  padding: 1px 6px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: var(--bg-float);
+  box-shadow: var(--shadow); font-family: var(--mono); font-size: var(--text-xs); color: var(--text-dim); white-space: nowrap;
+}

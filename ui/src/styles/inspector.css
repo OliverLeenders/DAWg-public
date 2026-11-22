@@ -1,0 +1,92 @@
+/* The track inspector.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Track inspector (phase 4) ---------------------------------------------- */
+.inspector {
+  margin: -2px 0 8px 12px; padding: var(--space-3) var(--space-4) var(--space-4); border-left: 2px solid var(--border);
+  /* One column no wider than the inspector, so long names shrink to an ellipsis instead of widening the rows. */
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2);
+}
+.inspector-label {
+  font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-top: 4px;
+}
+/* Track timing offset (phase 13): the field and its other-unit readout. */
+.track-offset { display: flex; flex-direction: column; gap: var(--space-1); margin: 0 0 6px 12px; }
+.track-offset.compact { margin: 0; gap: 0; }
+.track-offset > summary { cursor: pointer; }
+.offset-row { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.offset-title { width: 42px; font-size: var(--text-xs); color: var(--text-dim); }
+.offset-value {
+  flex: 1; min-width: 0; text-align: center; font-family: var(--mono); font-size: var(--text-s); padding: var(--space-1) var(--space-2);
+  background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.offset-unit {
+  flex: none; font-family: var(--mono); font-size: var(--text-xs); padding: 1px var(--space-2); cursor: pointer;
+  color: var(--text-dim); background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.offset-unit:hover { color: var(--text); border-color: var(--border-strong); }
+.offset-reset { flex: none; width: 18px; height: 18px; }
+.offset-readout {
+  display: flex; justify-content: space-between; gap: var(--space-3); padding-left: 46px;
+  font-family: var(--mono); font-size: var(--text-xs); color: var(--text-faint);
+}
+.offset-latency { color: var(--accent-ink); }
+.track-offset.compact .offset-value { font-size: var(--text-xs); padding: 1px var(--space-1); }
+.track-offset.compact input.drag-number.editing { width: 100%; }
+.track-offset.compact .offset-unit { font-size: var(--text-xs); padding: 0 var(--space-1); }
+.offset-other { font-family: var(--mono); font-size: var(--text-xs); text-align: center; color: var(--text-faint); }
+.mixer-strip.narrow .offset-other { display: none; }
+.slot {
+  display: flex; align-items: center; gap: var(--space-3); min-height: 28px; padding: var(--space-1) var(--space-2) var(--space-1) var(--space-4);
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.slot:hover { border-color: var(--border-strong); }
+.slot.open { border-color: var(--accent); }
+.slot.selected { background: var(--accent-soft); }
+.slot[draggable='true'] { cursor: grab; }
+.slot.dragging { opacity: 0.45; }
+.slot.drop-before { box-shadow: 0 -2px 0 var(--accent); }
+.slot-index { font-family: var(--mono); font-size: var(--text-xs); color: var(--text-dim); width: 12px; }
+.slot-name {
+  flex: 1; min-width: 0; text-align: left; background: none; border: none; padding: var(--space-2) 0; cursor: pointer;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slot.bypassed .slot-name, .slot.failed .slot-name { color: var(--text-dim); }
+.slot-name.key-send { color: var(--signal-key); }
+.slot-warning { color: var(--warn); flex-shrink: 0; }
+.slot-loading { color: var(--text-dim); flex-shrink: 0; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-slot {
+  justify-content: flex-start; gap: var(--space-3); color: var(--text-dim); cursor: pointer;
+  background: none; border-style: dashed;
+}
+.empty-slot:hover { color: var(--text); }
+.menu-backdrop.fixed, .context-menu.fixed { position: fixed; }
+.menu-separator { height: 1px; margin: 4px 0; background: var(--border); }
+.menu-item.check { display: flex; align-items: center; gap: var(--space-3); }
+.menu-check { width: 12px; display: inline-flex; }
+.menu-icon { width: 14px; flex: none; display: inline-flex; justify-content: center; color: var(--text-dim); }
+.menu-item:not(:disabled):hover .menu-icon { color: var(--text); }
+.menu-item.danger .menu-icon { color: inherit; }
+.menu-item.danger { color: var(--danger); }
+
+.plugin-picker {
+  position: fixed; z-index: var(--z-popover); width: 330px; max-height: min(560px, calc(100vh - 16px)); display: flex; flex-direction: column;
+  background: var(--bg-float); border: 1px solid var(--border-strong); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding-bottom: var(--space-2);
+}
+.plugin-picker .search { margin: 8px; }
+.picker-list { overflow: auto; padding: 0 var(--space-2); }
+.picker-item {
+  display: grid; grid-template-columns: 1fr auto; column-gap: var(--space-4); width: 100%; text-align: left;
+  padding: var(--space-3) var(--space-4); border: none; border-radius: var(--radius); background: none; cursor: pointer;
+}
+.picker-item.active { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.picker-item .plugin-vendor { grid-column: 1; }
+.picker-item .plugin-format { grid-row: 1; grid-column: 2; }
+.picker-folders { overflow: auto; padding: 0 var(--space-2); }
+.picker-folders .empty { padding: var(--space-3) var(--space-4); color: var(--text-dim); }
+.picker-entry { display: flex; align-items: baseline; gap: var(--space-6); max-width: 360px; }
+.picker-entry .plugin-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.picker-entry .plugin-vendor { font-size: var(--text-xs); color: var(--text-dim); }

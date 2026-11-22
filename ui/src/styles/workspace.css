@@ -1,0 +1,86 @@
+/* The workspace, its panels and the status bar.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Workspace -------------------------------------------------------------- */
+.workspace {
+  display: grid; grid-template-columns: 280px 1fr 320px; gap: 1px;
+  background: var(--border); min-height: 0;
+}
+.panel { display: flex; flex-direction: column; background: var(--bg); min-height: 0; }
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px var(--space-5); border-bottom: 1px solid var(--border);
+}
+.panel-body { overflow: auto; flex: 1; padding: var(--space-3); }
+.empty { color: var(--text-dim); padding: var(--space-4); }
+.empty > p { margin: 0 0 6px; }
+
+.track-row {
+  display: grid; grid-template-columns: 4px 1fr auto auto auto auto; align-items: center; gap: var(--space-4);
+  padding: var(--space-4); border-radius: var(--radius); background: var(--bg-panel); margin-bottom: 4px;
+}
+.track-row:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.track-colour { width: 4px; height: 24px; border-radius: var(--radius-s); }
+.track-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track-name-input { background: var(--lcd); border: 1px solid var(--accent); border-radius: var(--radius); padding: var(--space-1) var(--space-2); }
+.track-gain { font-family: var(--mono); font-size: var(--text-s); color: var(--text-dim); min-width: 64px; text-align: right; }
+/* Gain, pan and send levels in headers and lists: thin boxes, so two values side by side read as two fields. */
+.track-header .track-gain, .track-header .track-pan, .send-level { padding: 0 var(--space-2); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
+.track-header .track-gain:hover, .track-header .track-pan:hover, .send-level:hover { border-color: var(--accent); }
+
+.editor { display: flex; min-width: 0; }
+.editor-placeholder {
+  text-align: center; color: var(--text-dim);
+  border: 1px dashed var(--border); border-radius: var(--radius); padding: 40px 60px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 19px, rgba(255,255,255,0.025) 19px 20px),
+    repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,0.04) 79px 80px);
+}
+.editor-placeholder p { margin: 6px 0 0; }
+
+.search {
+  margin: 8px 12px 0; padding: var(--space-3) 10px;
+  background: var(--lcd); border: 1px solid var(--control-border); border-radius: var(--radius);
+}
+.search:focus { outline: none; border-color: var(--accent); }
+.scan-progress { padding: var(--space-4) var(--space-5) 0; display: grid; gap: var(--space-2); }
+.progress { height: 4px; background: var(--lcd); border-radius: var(--radius-s); overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); transform-origin: left; transition: transform 0.2s; }
+.scan-current { color: var(--text-dim); font-size: var(--text-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.plugin-row {
+  display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto;
+  column-gap: var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius);
+}
+.plugin-row:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.plugin-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plugin-vendor { grid-column: 2; color: var(--text-dim); font-size: var(--text-xs); }
+.plugin-format { grid-row: 1; grid-column: 3; color: var(--text-dim); font-size: var(--text-xs); }
+.badge {
+  grid-row: span 2; align-self: center;
+  font-size: var(--text-xs); font-weight: 700; padding: var(--space-2) var(--space-3); border-radius: var(--radius);
+}
+.badge.instrument { background: color-mix(in srgb, var(--category-instrument) 18%, transparent); color: var(--category-instrument); }
+.badge.effect { background: color-mix(in srgb, var(--category-effect) 15%, transparent); color: var(--category-effect); }
+.failed { color: var(--text-dim); font-size: var(--text-xs); padding: var(--space-4); }
+.failed div { overflow-wrap: anywhere; padding: var(--space-1) 0; }
+
+/* Status bar ------------------------------------------------------------- */
+.statusbar {
+  /* A whole number of pixels, so the dock above it isn't on a half pixel. */
+  display: flex; justify-content: space-between; align-items: center; height: 24px; line-height: 16px;
+  padding: 0 var(--space-5); font-size: var(--text-xs); color: var(--text-dim);
+  background: var(--bg-raised); border-top: 1px solid var(--border);
+}
+.error { background: none; border: none; color: var(--danger); cursor: pointer; }
+
+.loading, .disconnected {
+  height: 100%; display: grid; place-content: center; text-align: center; gap: var(--space-4); color: var(--text-dim);
+}
+.disconnected h1 { display: flex; align-items: center; justify-content: center; gap: var(--space-5); font-size: 40px; color: var(--text); }
+code { font-family: var(--mono); background: var(--bg-panel); padding: var(--space-1) var(--space-3); border-radius: var(--radius); }
+
+.track-summary { grid-column: 2; grid-row: 2; font-size: var(--text-xs); color: var(--text-dim); }
+.view-switch .icon-button.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.error { display: inline-flex; align-items: center; gap: var(--space-2); }

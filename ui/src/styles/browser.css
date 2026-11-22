@@ -1,0 +1,34 @@
+/* The sound explorer and the browser panel.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Sound explorer (phase 7) --------------------------------------------------- */
+.panel-toolbar { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-5) 0; color: var(--text-dim); font-size: var(--text-xs); }
+.explorer { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.explorer-roots { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-4) 10px 0; }
+.root-chip {
+  display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); font-size: var(--text-xs); cursor: pointer;
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim);
+}
+.root-chip.active { border-color: var(--accent); color: var(--text); }
+.root-chip.add { padding: var(--space-2) var(--space-3); }
+.explorer-search {
+  display: flex; align-items: center; gap: var(--space-3); margin: 8px 10px 4px; padding: var(--space-2) var(--space-4);
+  background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-dim);
+}
+.explorer-search input { flex: 1; background: none; border: none; outline: none; min-width: 0; }
+.explorer-list { flex: 1; min-height: 0; overflow: auto; padding: var(--space-1) var(--space-2); outline: none; }
+.explorer-row {
+  display: flex; align-items: center; gap: var(--space-3); height: 24px; padding-right: var(--space-3); border-radius: var(--radius);
+  cursor: default; color: var(--text-dim);
+}
+.explorer-row:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.explorer-row.selected { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--text); }
+.explorer-row.playing .file-icon { color: var(--ok); }
+.explorer-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.explorer-duration { font-family: var(--mono); font-size: var(--text-xs); }
+.explorer-preview { border-top: 1px solid var(--border); padding: var(--space-3) 10px var(--space-4); display: grid; gap: var(--space-3); }
+.preview-wave { width: 100%; height: 44px; display: block; background: var(--lcd); border-radius: var(--radius); }
+.explorer-controls { display: flex; align-items: center; gap: var(--space-4); font-size: var(--text-xs); color: var(--text-dim); }
+.explorer-controls input[type='range'] { flex: 1; accent-color: var(--accent); }
+.explorer-toggle { display: inline-flex; align-items: center; gap: var(--space-2); }

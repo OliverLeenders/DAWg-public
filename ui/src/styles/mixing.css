@@ -1,0 +1,33 @@
+/* Track faders and meters (mixing basics).
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Mixing basics (docs/design/mixing-basics.md) ------------------------------ */
+.meter-clip {
+  width: 7px; height: 7px; padding: 0; border-radius: 50%; flex-shrink: 0; cursor: pointer;
+  background: var(--lcd); border: 1px solid var(--border-strong);
+}
+.meter-clip.on { background: var(--danger); border-color: var(--danger); }
+.track-mix { display: flex; align-items: baseline; gap: var(--space-4); }
+.track-header .track-pan { font-family: var(--mono); font-size: var(--text-s); color: var(--text-dim); min-width: 30px; cursor: ew-resize; }
+/* The meter lines up with the header's content, past its groups' spines (and a group arm's own spine). */
+.track-header .track-meter { position: absolute; left: calc(var(--indent, 0px) + 12px); right: 6px; bottom: 4px; width: auto; }
+.group-arm .track-meter { left: calc(var(--indent, 0px) + 16px); }
+.track-header .track-meter .meter-lane { height: 3px; }
+.track-header.compact .track-meter { bottom: 3px; }
+.track-header.compact .track-meter .meter-lane { height: 2px; }
+/* The header meter doubles as a volume slider: its lanes are the track, with a knob at the fader's travel. */
+.meter-lanes { position: relative; }
+.meter-gain { position: absolute; inset: -4px 0; cursor: ew-resize; touch-action: none; }
+.meter-gain-knob {
+  position: absolute; top: 50%; width: 6px; height: 11px; transform: translate(-50%, -50%);
+  background: var(--text); border-radius: var(--radius-s); box-shadow: 0 0 0 1px var(--bg); pointer-events: none;
+}
+.track-header.compact .meter-gain-knob { height: 8px; }
+/* A compact row with a meter is centred in the space above it. */
+.track-header.compact.with-meter .track-header-body { padding-bottom: var(--space-5); }
+.header-row .switch { flex-shrink: 0; }
+.track-header .track-meter.input .meter-fill { background: linear-gradient(90deg, var(--meter-input) 0%, var(--meter-input) 70%, var(--meter-mid) 85%, var(--meter-clip) 100%); }
+.master-header { position: relative; height: 100%; border-top: 1px solid var(--border); border-bottom: none; background: var(--bg-raised); }
+.master-header .track-name { font-weight: 600; }
+.master-lane { border-top: 1px solid var(--border); background: var(--bg-raised); }

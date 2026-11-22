@@ -1,0 +1,17 @@
+/* The views' stylesheets, by area, in the order they were written: later files may rely on earlier ones (the
+   cascade), so keep the order. The tokens (tokens.css) and the controls (ui/controls.css) load before these. */
+@import './base.css';
+@import './topbar.css';
+@import './workspace.css';
+@import './roll.css';
+@import './inspector.css';
+@import './project.css';
+@import './arrangement.css';
+@import './browser.css';
+@import './mixing.css';
+@import './graph.css';
+@import './editing.css';
+@import './dock.css';
+@import './mixer.css';
+@import './devices.css';
+@import './depth.css';

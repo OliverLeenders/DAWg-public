@@ -1,0 +1,329 @@
+/* Presets, the Sampler, the audio editor, the modulation column, the instrument window, focus.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Presets ----------------------------------------------------------------- */
+.preset-selector-container { position: relative; display: inline-flex; align-items: center; }
+.preset-selector-button {
+  display: inline-flex; align-items: center; gap: var(--space-3); height: var(--control); padding: 0 var(--space-4);
+  font-size: var(--text-xs); background: var(--bg); border-color: var(--border);
+}
+.preset-selector-button:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); border-color: var(--border-strong); }
+.preset-selector-button.small { height: var(--control); padding: 0 var(--space-3); font-size: var(--text-xs); }
+.preset-selector-button.active .preset-icon,
+.preset-selector-button.active .preset-chevron { color: inherit; }
+.preset-icon { color: var(--accent); flex-shrink: 0; }
+.preset-label { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.preset-chevron { color: var(--text-dim); flex-shrink: 0; }
+.preset-menu-popup {
+  width: 240px; max-height: 380px; display: flex; flex-direction: column; z-index: var(--z-popover);
+}
+.preset-menu-header {
+  display: flex; align-items: center; justify-content: space-between; padding: var(--space-1) var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.preset-add-button {
+  display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--accent);
+  background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 1px var(--space-3);
+  cursor: pointer;
+}
+.preset-add-button:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); border-color: var(--accent); }
+.preset-save-form {
+  display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-3) var(--space-2); border-bottom: 1px solid var(--border);
+}
+.preset-name-input {
+  background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); padding: var(--space-2) var(--space-3); font-size: var(--text-xs); outline: none;
+}
+.preset-name-input:focus { border-color: var(--accent); }
+.preset-save-actions { display: flex; align-items: center; gap: var(--space-2); justify-content: flex-end; }
+.preset-save-confirm { height: 20px; font-size: var(--text-xs); padding: 0 var(--space-4); background: var(--accent); color: var(--on-accent); border: none; }
+.preset-menu-list { overflow-y: auto; max-height: 280px; display: flex; flex-direction: column; }
+.preset-item-row { display: flex; align-items: center; width: 100%; border-radius: var(--radius); }
+.preset-item-row:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.preset-item {
+  display: flex; align-items: center; gap: var(--space-3); flex: 1; min-width: 0; padding: var(--space-2) var(--space-3); font-size: var(--text-xs);
+  background: none; border: none; text-align: left; cursor: pointer; color: var(--text);
+}
+.preset-item:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.preset-item.active { color: var(--accent); font-weight: 600; }
+.preset-item-check { width: 12px; height: 12px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent); }
+.preset-item-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.preset-item-category { font-size: var(--text-xs); color: var(--text-dim); margin-left: auto; padding-left: var(--space-3); flex-shrink: 0; }
+.preset-item-delete {
+  background: none; border: none; color: var(--text-dim); cursor: pointer; padding: var(--space-2);
+  display: grid; place-items: center; border-radius: var(--radius); opacity: 0.6;
+}
+.preset-item-delete:hover { color: var(--danger); opacity: 1; background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.menu-heading.user-heading { color: var(--accent); }
+
+/* The Sampler's panel. */
+.sampler-panel { display: block; container-type: size; min-width: 760px; }
+/* Pads, the sample with its envelope under it, and the controls: by the panel's size (docs/ui-review-2026-11-10.md, 5.2). */
+.sampler-layout { display: grid; height: 100%; grid-template-columns: auto minmax(160px, 1fr) 176px; grid-template-rows: minmax(0, 1fr); grid-template-areas: 'list editors side'; gap: var(--space-5); }
+.sampler-list { grid-area: list; width: clamp(156px, min(calc(100cqh - 26px), 45cqw), 1400px); display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
+.sampler-bar { display: flex; align-items: center; gap: var(--space-2); }
+.sampler-bar .tabs { align-self: stretch; }
+.sampler-bar .icon-button { margin-left: auto; }
+.sampler-bar .icon-button + .icon-button { margin-left: 0; }
+.sampler-zones { flex: 1; min-height: 0; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+.sampler-zone { display: flex; justify-content: space-between; gap: var(--space-4); padding: var(--space-1) var(--space-3); font-size: var(--text-xs); cursor: pointer; }
+.sampler-zone:hover { background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay)); }
+.sampler-zone.selected { background: var(--selected); color: var(--accent-ink); }
+.sampler-zone:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sampler-zone-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sampler-zone-keys { flex: none; }
+.sampler-zone-name { flex: 1; }
+/* The zone's layer, where the sampler has more than one (docs/design/sampler-mapping.md, TL1). */
+.sampler-zone-layer { flex: none; color: var(--text-dim); }
+.sampler-zone.selected .sampler-zone-layer { color: inherit; }
+/* The Drum Synth (docs/design/drum-synth.md, DR12): the Sampler's pads on the left, the selected pad's header, knobs and
+   envelope on the right. */
+.drum-panel { display: flex; gap: var(--space-5); height: 100%; min-height: 0; }
+.drum-pads-column { flex: none; height: 100%; aspect-ratio: 0.88; min-width: 200px; max-width: 46%; display: flex; flex-direction: column; gap: var(--space-2); }
+.drum-pads-column .sampler-pads { flex: 1 1 0; width: auto; aspect-ratio: auto; }
+/* The pads' heading is a section header, its actions (presets, the kit's menu) at the end of the rule. */
+.drum-pads-column > .panel-section-header { height: var(--control); }
+.drum-pads-column .panel-section-actions { display: flex; align-items: center; gap: var(--space-2); }
+.drum-pad { user-select: none; }
+/* A hit is level, not choice: it flashes in the meters' colour, apart from the selected pad's accent. */
+.drum-pad.hit { background-image: linear-gradient(color-mix(in srgb, var(--meter-low) 22%, transparent), color-mix(in srgb, var(--meter-low) 22%, transparent)); box-shadow: inset 0 0 0 1px var(--meter-low); }
+.drum-pad-chips { display: flex; align-items: center; gap: var(--space-1); min-width: 0; color: var(--text-dim); }
+.drum-pad-model { font-size: var(--text-xs); white-space: nowrap; }
+.drum-chip { padding: 0 var(--space-1); font-size: var(--text-xs); line-height: 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-s); }
+.drum-editor { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+/* One row that never wraps (DS14): the name gives way first, then the output's menu. */
+.drum-pad-header { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.drum-pad-header > * { flex: none; }
+.drum-pad-header > select[aria-label="Output"] { flex: 0 1 auto; min-width: 72px; }
+.drum-pad-name { flex: 0 1 140px; min-width: 64px; width: 140px; height: var(--control); padding: 0 var(--space-3); font-size: var(--text-m); color: var(--text); background: var(--bg-panel); border: 1px solid var(--control-border); border-radius: var(--radius); }
+.drum-sound { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.drum-envelope { flex: 1 1 0; display: block; width: 100%; min-height: 40px; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); box-sizing: border-box; }
+/* Square pads where there is room; a short dock squeezes them. */
+.sampler-pads { flex: none; width: 100%; aspect-ratio: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: var(--space-2); }
+.sampler-pad { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; min-height: 0; overflow: hidden; padding: var(--space-2) var(--space-2); font-size: clamp(var(--text-xs), 2.6cqh, var(--text-s)); text-align: left; color: var(--text-dim); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
+.sampler-pad.filled { color: var(--text); background: var(--bg-hover); }
+.sampler-pad.selected { border-color: var(--accent); }
+.sampler-pad:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* A pad's name and, at its right, its key. */
+.sampler-pad-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); min-width: 0; }
+.sampler-pad-note { flex: none; font-family: var(--mono); font-size: var(--text-xs); color: var(--text-faint); }
+.sampler-pad-key, .sampler-pad-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sampler-pad-name { color: var(--text-dim); }
+.sampler-editors { grid-area: editors; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.sampler-wave { flex: 1 1 0; position: relative; min-width: 0; min-height: 40px; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.sampler-wave .panel-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sampler-wave-name { position: absolute; left: 8px; bottom: 4px; max-width: 60%; font-size: var(--text-xs); color: var(--text-dim); pointer-events: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sampler-wave-readout { position: absolute; right: 8px; top: 4px; padding: 1px var(--space-2); font-size: var(--text-xs); color: var(--text); background: var(--bg-raised); border-radius: var(--radius); }
+.sampler-wave-readout input { width: 56px; font-size: var(--text-xs); }
+.sampler-envelope { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); box-sizing: border-box; touch-action: none; }
+.sampler-envelope-fill { fill: var(--accent); opacity: 0.14; }
+.sampler-envelope-line { fill: none; stroke: var(--accent); stroke-width: 2; }
+.sampler-envelope-point { fill: var(--lcd); stroke: var(--accent); stroke-width: 1.2; cursor: grab; }
+.sampler-envelope-point:hover { fill: var(--accent); }
+.sampler-envelope-handle { cursor: move; }
+.sampler-envelope-hit { fill: transparent; }
+.sampler-envelope-handle-ring { fill: var(--lcd); stroke: var(--accent); stroke-width: 1.2; }
+.sampler-envelope-handle:hover .sampler-envelope-handle-ring { fill: var(--accent); }
+.sampler-side { grid-area: side; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-4); }
+.sampler-sound { flex: none; display: flex; flex-direction: column; gap: var(--space-3); min-height: 0; overflow-y: auto; }
+.sampler-knobs { display: flex; justify-content: space-between; }
+.segmented.sampler-modes { display: flex; width: 100%; }
+.segmented.sampler-modes > button { flex: 1; padding-inline: var(--space-1); white-space: nowrap; }
+.sampler-choice { display: flex; flex-direction: column; gap: var(--space-1); }
+.sampler-choice-label { font-size: var(--text-xs); color: var(--text-dim); }
+.sampler-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-dim); }
+.sampler-row > :last-child { color: var(--text); }
+.sampler-row > .select { min-width: 0; max-width: 128px; }
+.sampler-sound > .text-button { font-size: var(--text-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sampler-whole { flex: none; }
+/* The pitch mode under the whole sampler's knobs, across the column. */
+.sampler-whole .panel-section-items { flex-wrap: wrap; }
+.sampler-whole .sampler-choice { flex-basis: 100%; }
+.sampler-whole .sampler-rendering { flex-basis: 100%; margin: 0; font-size: var(--text-xs); color: var(--text-dim); }
+/* Short: the envelope's values, not knobs. */
+@container (max-height: 359px) {
+  .sampler-envelope-knobs { display: none; }
+  .readouts.sampler-envelope-values { display: grid; }
+}
+/* Low: the envelope drops its graph and keeps its values. */
+@container (max-height: 180px) {
+  .sampler-envelope-box > .sampler-envelope { display: none; }
+}
+.sampler-empty { flex: 1; align-self: center; text-align: center; }
+.sampler-mapping { display: grid; grid-template-columns: repeat(3, minmax(64px, auto)); gap: var(--space-3) var(--space-5); padding: var(--space-4); }
+.sampler-field { display: flex; flex-direction: column; font-size: var(--text-xs); color: var(--text-dim); }
+.sampler-field > :last-child { color: var(--text); font-size: var(--text-xs); }
+
+.graph-node-limit { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); flex: none; }
+.feedback-status { display: flex; align-items: center; gap: var(--space-5); padding: var(--space-4) 0; color: var(--text-dim); font-size: var(--text-xs); }
+.feedback-limit { display: inline-flex; align-items: center; gap: var(--space-3); }
+.feedback-limit::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--line, var(--text-faint)); }
+.feedback-limit.on { color: var(--warn); }
+.feedback-limit.on::before { background: var(--warn); }
+.feedback-short { color: var(--warn); }
+/* Status, not settings: dim text on one line each (no boxes, so they don't look editable). */
+.feedback-shortest { white-space: nowrap; }
+
+.graph-help { margin-left: auto; display: flex; }
+.graph-chip {
+  display: flex; align-items: center; gap: var(--space-3); height: 26px; padding: 0 10px; white-space: nowrap;
+  background: var(--bg-panel); border: 1px dashed var(--warn); border-radius: var(--radius-round); color: var(--warn); font-size: var(--text-xs); font-family: var(--mono);
+}
+.graph-chip.selected { border-style: solid; }
+.graph-chip.bypassed { opacity: 0.5; }
+
+/* The audio editor window and the Timing section (docs/design/time-stretching.md, TS12, TS13). */
+.audio-editor-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.audio-editor-toolbar .dim { color: var(--text-dim); font-size: var(--text-xs); white-space: nowrap; }
+.audio-editor-body { flex: 1; min-height: 0; display: flex; }
+.audio-editor-side {
+  width: 240px; flex: none; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: var(--space-4);
+  border-right: 1px solid var(--border); background: var(--bg-raised);
+}
+.audio-editor-area { flex: 1; min-width: 0; display: flex; position: relative; }
+/* The view tabs at the top of the side panel, across its width. */
+.audio-editor-views { display: flex; flex: none; }
+.audio-editor-views button { flex: 1; }
+.audio-editor-gestures summary { cursor: pointer; font-size: var(--text-xs); color: var(--text-dim); }
+.audio-editor-gestures[open] summary { margin-bottom: var(--space-2); }
+/* What a press would do under the pointer, over the canvas's bottom-left corner. */
+.audio-editor-status {
+  position: absolute; left: 8px; bottom: 6px; max-width: calc(100% - 16px); pointer-events: none;
+  padding: 2px 6px; border-radius: var(--radius); background: var(--bg-raised); color: var(--text-dim); font-size: var(--text-xs);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.audio-editor-canvas { flex: 1; min-width: 0; display: block; touch-action: none; }
+.audio-editor-hint { display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-dim); }
+.pitch-help { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: var(--space-1); }
+.timing-section { display: flex; flex-direction: column; gap: var(--space-3); }
+.timing-section .inspector-field { grid-template-columns: 64px auto auto auto; }
+.inspector-note { font-size: var(--text-xs); color: var(--text-dim); margin: 0; line-height: 1.4; }
+
+/* The dock's modulation column (docs/design/macros-and-modulation-column.md, MC12): macro knobs, source chips and the
+   chosen source's editor, laid out for the column's width. It scrolls on its own when the dock is short. */
+.mod-column {
+  flex: none; display: flex; flex-direction: column; gap: var(--space-3); min-height: 0; overflow-x: hidden; overflow-y: auto;
+  padding: var(--space-3) var(--space-4); border-right: 1px solid var(--border); background: var(--bg-raised);
+}
+.mod-macros { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-1) 0; }
+.mod-macro { position: relative; display: flex; flex-direction: column; align-items: center; border-radius: var(--radius); }
+.mod-macro .knob { width: 56px; }
+.mod-macro .knob svg { width: 28px; height: 28px; }
+.mod-macro .knob-label { font-size: var(--text-xs); max-width: 54px; }
+.mod-macro .knob-value-text { font-size: var(--text-xs); color: var(--text-dim); }
+.mod-macro.mapping { background: color-mix(in srgb, var(--mod) 18%, transparent); box-shadow: inset 0 0 0 1px var(--mod); }
+.mod-macro-tools { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; opacity: 0; transition: opacity 0.1s; }
+.mod-macro:hover .mod-macro-tools, .mod-macro.mapping .mod-macro-tools { opacity: 1; }
+.mod-grip { cursor: grab; color: var(--text-dim); display: flex; padding: 1px; }
+.icon-button.tiny { display: inline-flex; align-items: center; justify-content: center; }
+.icon-button.tiny.active { background: var(--mod); border-color: var(--mod); color: var(--on-accent); }
+.mod-add-macros {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-3); font-size: var(--text-xs); color: var(--text-dim);
+  border: 1px dashed var(--border-strong); border-radius: var(--radius); background: none; cursor: pointer;
+}
+.mod-add-macros:hover { color: var(--text); border-color: var(--mod); }
+.mod-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.mod-chip {
+  height: 20px; padding: 0 var(--space-4); font-size: var(--text-xs); color: var(--mod-ink); background: color-mix(in srgb, var(--mod) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mod) 45%, transparent); border-radius: var(--radius-round); cursor: pointer; display: inline-flex; align-items: center;
+}
+.mod-chip[draggable='true'] { cursor: grab; }
+.mod-chip:hover { border-color: var(--mod); }
+.mod-chip.active { background: var(--mod); border-color: var(--mod); color: var(--on-accent); }
+.mod-chip.bypassed { opacity: 0.5; }
+.mod-chip.add { padding: 0 var(--space-3); color: var(--text-dim); background: none; border-style: dashed; }
+.mod-hint { margin: 0; font-size: var(--text-xs); color: var(--text-faint); }
+/* The column scrolls rather than squeezing its parts over each other. */
+.mod-column > * { flex-shrink: 0; }
+.mod-editor { display: flex; flex-direction: column; gap: var(--space-2); }
+.mod-editor .panel-main { flex: none; min-height: auto; }
+.mod-editor-header { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-dim); }
+.mod-editor-header > span { flex: 1; }
+.mod-editor .device-panel { flex-direction: column; gap: var(--space-4); height: auto; }
+.mod-editor .panel-sections { flex-direction: row; flex-wrap: wrap; gap: var(--space-4) var(--space-5); }
+.mod-editor .lfo-panel .lfo-shape { height: auto; grid-template-rows: auto auto 96px auto; }
+.mod-editor .lfo-panel .lfo-shape-canvas { height: 96px; }
+.mod-editor .adsr-panel .panel-main { flex: none; }
+.mod-macros-editor { display: flex; flex-direction: column; gap: var(--space-3); }
+.mod-macro-row { display: flex; flex-direction: column; gap: var(--space-1); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border); }
+.mod-macro-fields { display: flex; align-items: center; gap: var(--space-2); }
+.mod-macro-number { width: 12px; font-family: var(--mono); font-size: var(--text-xs); color: var(--mod-ink); }
+.mod-macro-name { flex: 1; min-width: 0; height: 20px; font-size: var(--text-xs); }
+.mod-neutral svg { display: block; }
+.mod-macro-tool-group { display: flex; gap: 1px; }
+.mod-macro-cc { display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-xs); color: var(--text-dim); }
+.mod-macro-cc input { width: 30px; height: 20px; font-size: var(--text-xs); text-align: right; }
+.mod-targets { list-style: none; margin: 0; padding: 0 0 0 var(--space-6); display: flex; flex-direction: column; gap: 1px; }
+.mod-target { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); }
+.mod-target-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-dim); }
+/* The Links editor (docs/design/parameter-linking.md, L16). */
+.mod-links { display: flex; flex-direction: column; gap: var(--space-3); }
+.mod-link-group { display: flex; flex-direction: column; gap: var(--space-1); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border); }
+.mod-link-header { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); }
+.mod-link-header .mod-target-name { color: var(--text); }
+.mod-links .mod-targets { padding-left: var(--space-3); }
+.mod-target.inactive .mod-target-name { color: var(--text-faint); }
+.mod-chip.links { border-color: var(--link); }
+.mod-link-more { align-self: flex-start; margin-left: var(--space-3); padding: 0; border: 0; background: none; color: var(--text-faint); font-size: var(--text-xs); cursor: pointer; }
+.mod-link-more:hover { color: var(--text-dim); }
+.mod-expression { display: flex; flex-direction: column; gap: var(--space-3); }
+
+/* A modulated knob's swing, and the links the column draws (MC13). */
+.knob-swing path { fill: none; stroke: var(--mod); stroke-width: 1.5; stroke-linecap: round; }
+.knob-swing circle { fill: var(--mod-point); }
+.knob.mod-driven { background: color-mix(in srgb, var(--mod) 22%, transparent); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--mod); }
+.knob.mod-drop { background: color-mix(in srgb, var(--mod) 35%, transparent); border-radius: var(--radius); }
+.knob.mod-mapping svg { cursor: crosshair; }
+.knob.mod-mapping .knob-track { stroke: color-mix(in srgb, var(--mod) 55%, var(--border-strong)); }
+.midi-learnable.contents { display: contents !important; }
+
+/* Parameter links (docs/design/parameter-linking.md, L16): a tick under a knob that drives or follows another, the
+   other ends marked while the pointer is on one, and Link mode's cursor. */
+.knob.link-source, .knob.link-target { position: relative; }
+.knob.link-source::after, .knob.link-target::after {
+  content: ''; position: absolute; left: 50%; bottom: 0; width: 12px; height: 2px; margin-left: -6px; border-radius: 1px; background: var(--link);
+}
+.knob.link-target::after { background: transparent; border: 1px solid var(--link); height: 0; }
+.knob.link-marked { background: color-mix(in srgb, var(--link) 22%, transparent); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--link); }
+.knob.link-from { box-shadow: 0 0 0 1px var(--link); border-radius: var(--radius); }
+.knob.link-linking svg { cursor: crosshair; }
+.knob.link-linking .knob-track { stroke: color-mix(in srgb, var(--link) 55%, var(--border-strong)); }
+.graph-mod-macro { font-family: var(--mono); font-size: var(--text-xs); color: var(--mod-ink); padding: 0 var(--space-2); border: 1px solid var(--mod); border-radius: var(--radius); }
+
+/* The instrument and macros in the inspector (docs/design/macros-and-modulation-column.md, MC11, MC14). */
+.inspector-instrument { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-1) 0 var(--space-2); }
+.inspector-instrument-row { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.inspector-instrument-row > .text-button:last-child { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-2); }
+.inspector-knobs { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); }
+/* The dock's knob slot (58 px), so a 12 px value such as -12.0 dB fits on one line; four still fit across. */
+.inspector-knobs .knob { width: 58px; }
+.inspector-knobs .knob-label { display: block; max-width: 58px; }
+.inspector-knobs .knob > .midi-learnable:not(.contents) { max-width: 100%; overflow: hidden; }
+.instrument-knobs { display: flex; flex-wrap: wrap; gap: var(--space-5) var(--space-4); align-content: flex-start; }
+.inspector-macros .mod-macros { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.inspector:empty { display: none; }
+.strip-macros .mod-macros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.strip-macros .mod-macro .knob { width: 100%; }
+.strip-macros .mod-macro .knob svg { width: 22px; height: 22px; }
+.strip-macros .mod-macro .knob-label { font-size: var(--text-xs); max-width: 100%; }
+.strip-macros .mod-macro .knob-value-text { display: none; }
+
+/* An instrument's own window (docs/design/macros-and-modulation-column.md, MC14). */
+.instrument-app { display: flex; flex-direction: column; height: 100vh; }
+.instrument-app .roll-toolbar { flex: none; height: 36px; padding: 0 140px 0 var(--space-5); }
+.instrument-app-title { font-size: var(--text-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.instrument-panel { flex: 1; min-height: 0; overflow: auto; padding: var(--space-5); background: var(--bg-raised); }
+.instrument-panel > .device-panel { height: 100%; }
+.instrument-graph { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.instrument-graph-view { flex: 1; min-height: 0; position: relative; display: flex; }
+.instrument-graph-view > * { flex: 1; min-width: 0; }
+.instrument-strip { flex: 0 0 240px; min-height: 0; display: flex; border-top: 1px solid var(--frame); background: var(--bg-raised); }
+
+/* Keyboard focus is always visible (docs/ui-review-2026-11-10.md, 3.8): a ring on controls, and an inset line on the
+   canvases and lists that take focus, where their own focus style was removed. */
+:where(button, select, input, textarea, summary, a, [role='button'], [tabindex]):focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.roll-canvas:focus-visible, .arrangement-canvas:focus-visible, .marker-row:focus-visible, .track-headers:focus-visible,
+.explorer-list:focus-visible, .device-strip:focus-visible, .graph-canvas:focus-visible { outline: 1px solid var(--accent); outline-offset: -1px; }
+.explorer-search:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+.modal.shortcut-reference:focus-visible { outline: none; }

@@ -1,0 +1,240 @@
+/* The node graph.
+   Part of what was styles.css, split by area (docs/design/design-system.md, step 9); styles/index.css loads the
+   files in order, so the cascade is as it was. */
+
+/* Node graph (docs/design/phase8-node-graph.md) ----------------------------- */
+.graph-view { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; }
+.graph-view .roll-toolbar { flex-wrap: nowrap; }
+.graph-view .hint { flex: 1 1 0; }
+.graph-track { color: var(--text-dim); }
+/* The graph's header: an icon for the view, the path to the graph shown, a warning chip, the flow, help. */
+.graph-header { gap: var(--space-4); }
+.graph-header-icon { flex: none; color: var(--text-dim); }
+.graph-breadcrumb { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.graph-crumb { padding: 0; border: none; background: none; color: var(--text-dim); font: inherit; white-space: nowrap; cursor: pointer; }
+.graph-crumb:hover { color: var(--text); text-decoration: underline; }
+.graph-crumb.current { color: var(--text); font-weight: 600; cursor: default; }
+.graph-crumb.current:hover { text-decoration: none; }
+.graph-breadcrumb-separator { flex: none; color: var(--text-faint); }
+.graph-warning {
+  display: inline-flex; align-items: center; gap: var(--space-2); padding: 1px var(--space-3); white-space: nowrap;
+  border: 1px solid var(--warn-rule); border-radius: var(--radius); background: var(--warn-surface); color: var(--warn); font-size: var(--text-xs);
+}
+.graph-canvas { position: relative; flex: 1; min-height: 0; outline: none; }
+.graph-canvas .react-flow {
+  --xy-background-color: var(--bg);
+  --xy-background-pattern-color: color-mix(in srgb, var(--text-faint) 35%, var(--bg));
+  --xy-node-background-color: transparent;
+  --xy-edge-stroke: var(--text-faint);
+  --xy-edge-stroke-selected: var(--accent);
+  --xy-selection-background-color: color-mix(in srgb, var(--accent) 8%, transparent);
+  --xy-selection-border: 1px dashed var(--accent);
+  --xy-controls-button-background-color: var(--bg-raised);
+  --xy-controls-button-background-color-hover: color-mix(in srgb, var(--bg-raised), white 4%);
+  --xy-controls-button-color: var(--text);
+  --xy-controls-button-border-color: var(--border);
+  --xy-minimap-background-color: var(--bg-raised);
+}
+.graph-edge.audio path.react-flow__edge-path { stroke: var(--signal-audio); }
+.graph-edge.events path.react-flow__edge-path { stroke: var(--signal-events); stroke-dasharray: 5 3; }
+.graph-edge.modulation path.react-flow__edge-path { stroke: var(--mod); stroke-dasharray: 2 3; }
+.graph-edge.loop-back path.react-flow__edge-path { stroke: var(--warn); stroke-dasharray: 7 4; }
+.graph-edge.selected path.react-flow__edge-path { stroke: var(--text); stroke-width: 2; }
+/* Modulation stays in the background until it's looked at, and whatever's out of focus quietens. */
+.graph-edge { transition: opacity 0.12s; }
+.graph-edge.modulation { opacity: 0.3; }
+.graph-edge.modulation.focused, .graph-edge.modulation.selected, .graph-edge.modulation:hover { opacity: 1; }
+.graph-edge.faded { opacity: 0.15; }
+/* Every fifth grid point (graph-grid-and-cables.md, G2). */
+.graph-canvas .react-flow__background.graph-grid-major { background-color: transparent; --xy-background-pattern-color: color-mix(in srgb, var(--text-faint) 60%, var(--bg)); }
+.react-flow__node.faded { opacity: 0.45; transition: opacity 0.12s; }
+/* Only the visible path: the wider, invisible one around it is what the pointer hits. */
+.react-flow__node.dragging { opacity: 0.5; }
+/* Editing a cable (graph-grid-and-cables.md, G6): a wide grab line along each stretch, and the bends as small handles on a hovered or
+   selected cable. */
+.graph-cable-grab { fill: none; stroke: transparent; stroke-width: 10; pointer-events: stroke; }
+.graph-cable-grab.flat { cursor: ns-resize; }
+.graph-cable-grab.upright { cursor: ew-resize; }
+.graph-bend { fill: var(--bg-float); stroke: var(--text-dim); stroke-width: 1; opacity: 0; cursor: pointer; transition: opacity 0.12s; }
+.react-flow__edge:hover .graph-bend, .react-flow__edge.selected .graph-bend { opacity: 1; }
+.react-flow__edge.selected .graph-bend { stroke: var(--accent); }
+.graph-edge.insert-target .react-flow__edge-path { stroke: var(--text); stroke-width: 3; }
+.graph-node {
+  min-width: 150px; overflow: visible; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: var(--text-xs); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.graph-node.selected { border-color: var(--accent); }
+.graph-node.bypassed { opacity: 0.55; }
+.graph-node-header {
+  display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); border-radius: var(--radius) 5px 0 0;
+  border-bottom: 1px solid var(--border); border-top: 3px solid var(--category, var(--category-io));
+}
+.graph-node.instrument { --category: var(--category-instrument); }
+.graph-node.effect { --category: var(--category-effect); }
+.graph-node.utility { --category: var(--category-utility); }
+.graph-node.io { --category: var(--category-io); }
+.graph-node-name { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.graph-node-button {
+  display: grid; place-items: center; width: 18px; height: var(--control-s); padding: 0; border-radius: var(--radius); cursor: pointer;
+  background: transparent; border: 1px solid transparent; color: var(--text-dim);
+}
+.graph-node-button:hover { border-color: var(--border); color: var(--text); }
+.graph-node-voices {
+  min-width: 16px; padding: 0 var(--space-2); border-radius: var(--radius-round); text-align: center; font-size: var(--text-xs); line-height: 14px;
+  color: var(--text-dim); background: var(--bg); font-variant-numeric: tabular-nums;
+}
+.graph-node-body { display: flex; justify-content: space-between; gap: var(--space-5); padding: var(--space-2) 0; }
+/* An Output to track node's track (docs/design/multi-output-instruments.md, MO3). */
+.graph-node-target { display: block; margin: 0 8px 6px; max-width: calc(100% - 16px); font-size: var(--text-xs); }
+.graph-ports { display: grid; align-content: start; gap: var(--space-2); }
+.graph-ports.out { text-align: right; }
+.graph-port { position: relative; padding: 0 10px; color: var(--text-dim); line-height: 16px; }
+.graph-handle { width: 9px; height: 9px; border: 1px solid var(--bg); }
+.graph-handle.audio { background: var(--signal-audio); }
+.graph-handle.events { background: var(--signal-events); border-radius: var(--radius-s); }
+.graph-handle.modulation { background: var(--mod); border-radius: 50%; }
+.graph-port.modulation { color: var(--mod-ink); }
+.graph-port.any { opacity: 0.7; font-style: italic; }
+.graph-exposed-list { display: grid; gap: var(--space-1); padding: var(--space-2) 10px var(--space-3); border-top: 1px solid var(--border); }
+.graph-exposed { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--space-4); color: var(--text-dim); font-size: var(--text-xs); }
+.graph-exposed span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.graph-exposed-choice { max-width: 110px; font-size: var(--text-xs); }
+.param-switch { min-width: 38px; }
+.device-panel.component-panel { display: grid; gap: var(--space-4); height: auto; align-content: start; }
+.component-delete { padding: 0; background: none; border: none; color: var(--text-dim); cursor: pointer; }
+.component-delete:hover { color: var(--text); }
+.component-panel-head { display: flex; align-items: center; gap: var(--space-4); }
+.component-panel-head .text-button { display: inline-flex; align-items: center; gap: var(--space-3); }
+.component-name { width: 180px; }
+.component-control { position: relative; }
+.component-control-remove {
+  visibility: hidden; position: absolute; top: 0; right: 0; width: 14px; height: 14px; padding: 0; display: grid; place-items: center;
+  background: none; border: none; color: var(--text-dim); cursor: pointer;
+}
+.component-control:hover .component-control-remove { visibility: visible; }
+.component-control-name { position: absolute; left: 0; right: 0; bottom: 14px; width: 100%; font-size: var(--text-xs); }
+.param-pin { opacity: 0.45; }
+.param-pin.active, .inspector-field:hover .param-pin { opacity: 1; }
+.graph-handle.any { background: var(--bg-panel); border: 1px dashed var(--text-dim); }
+/* Split nodes' ports and bands in their colours: bands low to high, mid and side as the EQ's, left and right apart
+   (split-nodes.md, section 6). A mono port keeps its ring, in the colour. */
+.tone-band-0 { --tone: var(--tone-1); } .tone-band-1 { --tone: var(--tone-2); } .tone-band-2 { --tone: var(--tone-3); } .tone-band-3 { --tone: var(--tone-4); }
+.tone-mid { --tone: var(--tone-mid); } .tone-side { --tone: var(--tone-side); }
+.tone-left { --tone: var(--tone-left); } .tone-right { --tone: var(--tone-right); } .tone-dry { --tone: var(--tone-dry); }
+.graph-handle.audio[class*='tone-'] { background: var(--tone); }
+.graph-handle.audio.mono[class*='tone-'] { background: var(--bg-panel); border-color: var(--tone); }
+.band-split-view { display: block; width: calc(100% - 12px); height: 22px; margin: 2px 6px 6px; border-radius: var(--radius); overflow: hidden; }
+.band-split-band { fill: var(--tone); opacity: 0.28; }
+.band-split-crossover { stroke: var(--text); stroke-width: 1; opacity: 0.7; vector-effect: non-scaling-stroke; }
+.band-split-handle { fill: transparent; cursor: ew-resize; }
+.band-split-handle:hover { fill: var(--text); opacity: 0.15; }
+/* A mono port is a ring, its cables thinner, and an input that folds stereo to mono a small bar (mono-ports.md, MP8, MP9). */
+.graph-handle.audio.mono { background: var(--bg-panel); border: 2px solid var(--signal-audio); }
+.graph-edge.audio.mono path.react-flow__edge-path { stroke-width: 0.75; }
+.graph-fold {
+  display: inline-block; width: 3px; height: 9px; margin-right: 3px; vertical-align: middle; border-radius: 1px; background: var(--warn);
+}
+.graph-port-name { width: 70px; height: 14px; padding: 0 var(--space-1); font-size: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); }
+.graph-port-remove {
+  display: inline-grid; visibility: hidden; margin-left: 3px; padding: 0; width: 10px; height: 10px; place-items: center; vertical-align: -1px;
+  background: none; border: none; color: var(--text-dim); cursor: pointer;
+}
+.graph-port:hover .graph-port-remove { visibility: visible; }
+/* A component port's width (mono-ports.md, MP11): shown while not stereo, and on hover. */
+.graph-port-width {
+  visibility: hidden; margin-left: 3px; padding: 0 var(--space-1); height: 11px; line-height: 9px; font-size: 9px; /* a glyph in its box, as a handle's */ vertical-align: 0;
+  background: none; border: 1px solid var(--border); border-radius: var(--radius-s); color: var(--text-dim); cursor: pointer;
+}
+.graph-port-width.set, .graph-port:hover .graph-port-width { visibility: visible; }
+.graph-port-width.set { color: var(--signal-audio); border-color: var(--signal-audio); }
+.graph-port-width:hover { color: var(--text); }
+.graph-port-remove:hover { color: var(--text); }
+.graph-mod-slot { display: flex; align-items: center; gap: var(--space-2); margin-top: 2px; }
+.graph-mod-target { min-width: 0; max-width: 104px; font-size: var(--text-xs); padding: 1px var(--space-2); }
+.graph-mod-depth {
+  min-width: 38px; padding: 1px var(--space-2); text-align: right; font-family: var(--mono); font-size: var(--text-s); color: var(--mod-ink);
+  background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.graph-mod-retry { display: block; margin: 0 6px 6px; font-size: var(--text-xs); }
+.graph-canvas.vertical .graph-node-body { flex-direction: column; gap: var(--space-2); }
+.graph-canvas.vertical .graph-ports { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+.graph-canvas.vertical .graph-ports.out { text-align: center; }
+.graph-canvas.vertical .graph-port { padding: var(--space-3) var(--space-2); text-align: center; }
+.graph-node-badges { display: flex; gap: var(--space-2); padding: 0 var(--space-3) var(--space-3); }
+.graph-node-badges .badge.failed { background: var(--danger); color: var(--on-accent); }
+.graph-problem {
+  position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); padding: var(--space-3) 10px; border-radius: var(--radius);
+  background: var(--bg-raised); border: 1px solid var(--danger); color: var(--danger); font-size: var(--text-s);
+}
+.graph-actions {
+  position: absolute; top: 10px; left: 10px; z-index: 5; display: flex; gap: var(--space-2); padding: var(--space-2);
+  background: color-mix(in srgb, var(--bg-raised) 90%, transparent); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.graph-actions .text-button { font-size: var(--text-xs); }
+.graph-minimap { background: var(--bg-raised); }
+.node-inspector { display: grid; gap: var(--space-2); padding-bottom: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--border); }
+.node-inspector-title { display: flex; align-items: center; gap: var(--space-3); }
+.node-inspector-title span { flex: 1; }
+.lfo-shape { display: grid; gap: var(--space-2); margin-top: 6px; }
+.lfo-shape-header { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-dim); }
+.lfo-shape-header > span { flex: 1; }
+.lfo-presets { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.lfo-presets button { font-size: var(--text-xs); padding: var(--space-1) var(--space-3); }
+.lfo-zero-row { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-dim); }
+.lfo-zero-options { display: flex; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); }
+.lfo-zero-options button {
+  border: 0; border-radius: 0; padding: 1px 7px; font-size: var(--text-xs); background: transparent; color: var(--text-dim);
+}
+.lfo-zero-options button + button { border-left: 1px solid var(--border); }
+.lfo-bipolar-icon { display: inline-flex; }
+.lfo-zero-options button.active { background: var(--accent); color: var(--on-accent); }
+.lfo-shape-canvas { width: 100%; height: 110px; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); touch-action: none; cursor: crosshair; }
+.lfo-zero { stroke: var(--text-dim); stroke-width: 0.7; stroke-dasharray: 2 2; opacity: 0.75; vector-effect: non-scaling-stroke; }
+.lfo-grid { stroke: var(--border); stroke-width: 0.4; opacity: 0.5; }
+.lfo-curve { fill: none; stroke: var(--mod); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.lfo-point { fill: var(--mod); stroke: var(--bg); stroke-width: 1; vector-effect: non-scaling-stroke; cursor: grab; }
+.lfo-point.selected { fill: var(--mod-point); stroke: var(--mod); stroke-width: 1.5; }
+.lfo-tension { cursor: move; }
+.lfo-tension-hit { fill: transparent; pointer-events: all; }
+.lfo-tension-handle { fill: transparent; stroke: var(--mod); stroke-width: 0.8; vector-effect: non-scaling-stroke; }
+.lfo-shape-hint { font-size: var(--text-xs); color: var(--text-dim); }
+/* In the device dock (dock/LfoPanel.tsx) the shape fills the panel's height and the hint stays on one line. */
+.lfo-panel .lfo-shape { height: 100%; min-height: 0; margin-top: 0; grid-template-rows: auto auto minmax(48px, 1fr) auto; }
+.lfo-panel .lfo-shape-canvas { height: 100%; }
+.lfo-panel .lfo-shape-hint { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* "0.00 cycles" on two lines would push the panel past the dock's default height. */
+.lfo-panel .knob-value-text { white-space: nowrap; }
+/* The ADSR's envelope graph, with its knobs underneath (docs/design/modulation.md, M3). */
+.adsr-panel .panel-main { gap: var(--space-3); }
+.adsr-editor { flex: 1; min-height: 48px; display: flex; }
+.adsr-canvas { width: 100%; height: 100%; background: var(--lcd); border: 1px solid var(--border); border-radius: var(--radius); touch-action: none; }
+.adsr-grid { stroke: var(--border); stroke-width: 1; opacity: 0.6; }
+.adsr-fill { fill: var(--mod); opacity: 0.12; }
+.adsr-curve { fill: none; stroke: var(--mod); stroke-width: 1.4; stroke-linejoin: round; }
+.adsr-hit { fill: transparent; pointer-events: all; }
+.adsr-point { fill: var(--mod); stroke: var(--bg); stroke-width: 1; }
+.adsr-point.fixed { opacity: 0.6; }
+.adsr-corner { cursor: ew-resize; }
+.adsr-corner.decay { cursor: move; }
+.adsr-corner.sustain { cursor: ns-resize; }
+.adsr-corner:hover .adsr-point { fill: var(--mod-point); }
+.adsr-handle { cursor: move; }
+.adsr-handle-ring { fill: var(--lcd); stroke: var(--mod); stroke-width: 1.2; }
+.adsr-handle:hover .adsr-handle-ring { fill: var(--mod); }
+.adsr-knobs { display: flex; gap: var(--space-6); flex-wrap: wrap; }
+/* Choice slots fit their choice and keep their chevron; longer names end in an ellipsis, the full one in the tooltip
+   (docs/ui-review-2026-11-10.md, 3.1). */
+.choice-slot { height: 32px; min-width: 58px; max-width: 104px; font-size: var(--text-xs); padding: 0 var(--space-6) 0 var(--space-3);
+  background-position: calc(100% - 5px) 50%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+.knob:has(> .choice-slot) { width: auto; min-width: 58px; }
+.param-slider { display: flex; align-items: center; gap: var(--space-3); min-width: 0; flex: 1; }
+.param-slider input[type='range'] { flex: 1; min-width: 0; accent-color: var(--accent); }
+.param-value { font-family: var(--mono); font-size: var(--text-s); color: var(--text-dim); min-width: 62px; text-align: right; }
+.custom-routing { display: grid; gap: var(--space-2); }
+.custom-routing .text-button { display: inline-flex; align-items: center; gap: var(--space-3); justify-self: start; }
+.plugin-row[draggable='true'] { cursor: grab; }
+.inspector-field .param-slider { grid-column: 2 / -1; }
+.node-inspector .inspector-field { grid-template-columns: 78px 1fr auto; }
+.node-inspector .inspector-field select, .node-inspector .inspector-field input[type='checkbox'] { grid-column: 2; justify-self: start; }
+.topbar .project-name { flex-shrink: 0; }
+.graph-canvas .react-flow { --xy-minimap-mask-background-color: color-mix(in srgb, var(--bg) 60%, transparent); --xy-minimap-node-background-color: var(--border-strong); }
